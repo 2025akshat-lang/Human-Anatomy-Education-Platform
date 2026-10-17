@@ -100,7 +100,7 @@ export default function App() {
             setLoaded(true)
             updateModelSex(modelSex)
           }}
-          src="/human-atlas-3d.html"
+          src={`${import.meta.env.BASE_URL}human-atlas-3d.html`}
           title="Interactive three-dimensional human anatomy model"
         />
         {cleanView && (

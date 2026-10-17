@@ -12,13 +12,13 @@ export default defineConfig(({ mode }) => {
   const emitSourcemaps = mode === 'development'
 
   return {
-    base: process.env.FIGMA_PUBLIC_URL ? `${process.env.FIGMA_PUBLIC_URL}/` : '/',
+    base: process.env.FIGMA_PUBLIC_URL ? `${process.env.FIGMA_PUBLIC_URL}/` : '/Human-Anatomy-Education-Platform/',
     build: {
       sourcemap: emitSourcemaps ? 'inline' : false,
       minify: !emitSourcemaps,
     },
     plugins: [
-react(),
+      react(),
       tailwindcss(),
       figmaSiteConfiguration(siteConfiguration),
       figmaErrorOverlayReplay(),
@@ -37,7 +37,7 @@ react(),
       watch: {
         ignored: [
           '**/.figma/**',
-],
+        ],
       },
     },
     preview: {
@@ -365,7 +365,7 @@ function figmaMakeKitPlugin(options: { storiesGlob: string | string[] }): Plugin
     name: 'figma-make-kit',
     apply: 'serve',
     resolveId(id) {
-      if (id === VIRTUAL_ID) return RESOLVED_ID
+      if (id === VIRTURL_ID) return RESOLVED_ID
       return null
     },
     load(id) {

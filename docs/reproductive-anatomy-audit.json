@@ -1,0 +1,735 @@
+{
+  "sourceRows": 245,
+  "structures": 35,
+  "method": "Manual code-evidence audit. Shared labels and shared parent parts are grouped, not independent. Conceptual embedded cell-like meshes are not dedicated micro scenes. All validation remains pending.",
+  "counts": {
+    "gross": {
+      "independent": 27,
+      "missing": 7,
+      "grouped": 1
+    },
+    "detail": {
+      "independent": 31,
+      "grouped": 4
+    },
+    "micro": {
+      "missing": 26,
+      "independent": 8,
+      "conceptual-embedded": 1
+    },
+    "relationships": {
+      "partial": 26,
+      "missing": 9
+    },
+    "neurovascular": {
+      "missing": 26,
+      "partial": 9
+    },
+    "lymphatics": {
+      "missing": 34,
+      "partial": 1
+    }
+  },
+  "records": [
+    {
+      "structure": "Broad ligament",
+      "featureIds": [
+        "ANAT-3935",
+        "ANAT-3936",
+        "ANAT-3937",
+        "ANAT-3938",
+        "ANAT-3939",
+        "ANAT-3940",
+        "ANAT-3941"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Combined broad/round/ovarian/suspensory-ligament detail part"
+    },
+    {
+      "structure": "Bulbourethral glands",
+      "featureIds": [
+        "ANAT-3809",
+        "ANAT-3810",
+        "ANAT-3811",
+        "ANAT-3812",
+        "ANAT-3813",
+        "ANAT-3814",
+        "ANAT-3815"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "missing",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Two meshes share a combined gland and pelvic-floor detail part"
+    },
+    {
+      "structure": "Cervix",
+      "featureIds": [
+        "ANAT-3893",
+        "ANAT-3894",
+        "ANAT-3895",
+        "ANAT-3896",
+        "ANAT-3897",
+        "ANAT-3898",
+        "ANAT-3899"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Gross cervix mesh plus canal/fornix detail geometry"
+    },
+    {
+      "structure": "Clitoris",
+      "featureIds": [
+        "ANAT-3914",
+        "ANAT-3915",
+        "ANAT-3916",
+        "ANAT-3917",
+        "ANAT-3918",
+        "ANAT-3919",
+        "ANAT-3920"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "partial",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Gross glans plus separate clitoral body/crura detail geometry"
+    },
+    {
+      "structure": "Corpora cavernosa",
+      "featureIds": [
+        "ANAT-3823",
+        "ANAT-3824",
+        "ANAT-3825",
+        "ANAT-3826",
+        "ANAT-3827",
+        "ANAT-3828",
+        "ANAT-3829"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "partial",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Separated paired erectile cylinders in male detail scene"
+    },
+    {
+      "structure": "Corpus spongiosum",
+      "featureIds": [
+        "ANAT-3830",
+        "ANAT-3831",
+        "ANAT-3832",
+        "ANAT-3833",
+        "ANAT-3834",
+        "ANAT-3835",
+        "ANAT-3836"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Dedicated spongiosum/urethra mesh in male detail scene"
+    },
+    {
+      "structure": "Ductus deferens",
+      "featureIds": [
+        "ANAT-3774",
+        "ANAT-3775",
+        "ANAT-3776",
+        "ANAT-3777",
+        "ANAT-3778",
+        "ANAT-3779",
+        "ANAT-3780"
+      ],
+      "gross": "independent",
+      "detail": "grouped",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Bilateral gross tubes; combined cord/duct detail part"
+    },
+    {
+      "structure": "Ejaculatory ducts",
+      "featureIds": [
+        "ANAT-3795",
+        "ANAT-3796",
+        "ANAT-3797",
+        "ANAT-3798",
+        "ANAT-3799",
+        "ANAT-3800",
+        "ANAT-3801"
+      ],
+      "gross": "missing",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Combined with seminal-vesicle detail part"
+    },
+    {
+      "structure": "Endometrium",
+      "featureIds": [
+        "ANAT-3879",
+        "ANAT-3880",
+        "ANAT-3881",
+        "ANAT-3882",
+        "ANAT-3883",
+        "ANAT-3884",
+        "ANAT-3885"
+      ],
+      "gross": "missing",
+      "detail": "independent",
+      "micro": "independent",
+      "relationships": "missing",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Selectable endometrial volume and uterine cavity"
+    },
+    {
+      "structure": "Epididymis",
+      "featureIds": [
+        "ANAT-3767",
+        "ANAT-3768",
+        "ANAT-3769",
+        "ANAT-3770",
+        "ANAT-3771",
+        "ANAT-3772",
+        "ANAT-3773"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Bilateral gross path and dedicated detail part"
+    },
+    {
+      "structure": "Fimbriae",
+      "featureIds": [
+        "ANAT-3865",
+        "ANAT-3866",
+        "ANAT-3867",
+        "ANAT-3868",
+        "ANAT-3869",
+        "ANAT-3870",
+        "ANAT-3871"
+      ],
+      "gross": "grouped",
+      "detail": "grouped",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Multiple fimbrial tubes share uterine-tube parent part"
+    },
+    {
+      "structure": "Mammary gland",
+      "featureIds": [
+        "ANAT-3921",
+        "ANAT-3922",
+        "ANAT-3923",
+        "ANAT-3924",
+        "ANAT-3925",
+        "ANAT-3926",
+        "ANAT-3927"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "independent",
+      "relationships": "partial",
+      "neurovascular": "partial",
+      "lymphatics": "partial",
+      "validation": "pending",
+      "evidence": "Bilateral gross glands and dedicated breast cross-section"
+    },
+    {
+      "structure": "Myometrium",
+      "featureIds": [
+        "ANAT-3886",
+        "ANAT-3887",
+        "ANAT-3888",
+        "ANAT-3889",
+        "ANAT-3890",
+        "ANAT-3891",
+        "ANAT-3892"
+      ],
+      "gross": "missing",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "missing",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Selectable myometrial shell in uterine detail scene"
+    },
+    {
+      "structure": "Ovarian cortex and medulla",
+      "featureIds": [
+        "ANAT-3851",
+        "ANAT-3852",
+        "ANAT-3853",
+        "ANAT-3854",
+        "ANAT-3855",
+        "ANAT-3856",
+        "ANAT-3857"
+      ],
+      "gross": "missing",
+      "detail": "grouped",
+      "micro": "independent",
+      "relationships": "missing",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Follicles are meshes but cortex and medulla are not separated"
+    },
+    {
+      "structure": "Ovarian ligament",
+      "featureIds": [
+        "ANAT-3949",
+        "ANAT-3950",
+        "ANAT-3951",
+        "ANAT-3952",
+        "ANAT-3953",
+        "ANAT-3954",
+        "ANAT-3955"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Shares combined uterine-support ligament part"
+    },
+    {
+      "structure": "Ovary",
+      "featureIds": [
+        "ANAT-3844",
+        "ANAT-3845",
+        "ANAT-3846",
+        "ANAT-3847",
+        "ANAT-3848",
+        "ANAT-3849",
+        "ANAT-3850"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "independent",
+      "relationships": "partial",
+      "neurovascular": "partial",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Bilateral gross ovaries and follicle-bearing detail meshes"
+    },
+    {
+      "structure": "Pelvic fascia",
+      "featureIds": [
+        "ANAT-3928",
+        "ANAT-3929",
+        "ANAT-3930",
+        "ANAT-3931",
+        "ANAT-3932",
+        "ANAT-3933",
+        "ANAT-3934"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Bilateral gross fascial sheets plus paracervical detail plane"
+    },
+    {
+      "structure": "Penile erectile bodies",
+      "featureIds": [
+        "ANAT-3816",
+        "ANAT-3817",
+        "ANAT-3818",
+        "ANAT-3819",
+        "ANAT-3820",
+        "ANAT-3821",
+        "ANAT-3822"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "partial",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Cavernosa and spongiosum separated in male detail scene"
+    },
+    {
+      "structure": "Placenta",
+      "featureIds": [
+        "ANAT-3963",
+        "ANAT-3964",
+        "ANAT-3965",
+        "ANAT-3966",
+        "ANAT-3967",
+        "ANAT-3968",
+        "ANAT-3969"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "independent",
+      "relationships": "partial",
+      "neurovascular": "partial",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Separate pregnancy-state placenta with plates and villous-tree geometry"
+    },
+    {
+      "structure": "Prostate zones",
+      "featureIds": [
+        "ANAT-3802",
+        "ANAT-3803",
+        "ANAT-3804",
+        "ANAT-3805",
+        "ANAT-3806",
+        "ANAT-3807",
+        "ANAT-3808"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "independent",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Concentric zone volumes share one prostate-zones part"
+    },
+    {
+      "structure": "Rete testis",
+      "featureIds": [
+        "ANAT-3760",
+        "ANAT-3761",
+        "ANAT-3762",
+        "ANAT-3763",
+        "ANAT-3764",
+        "ANAT-3765",
+        "ANAT-3766"
+      ],
+      "gross": "missing",
+      "detail": "independent",
+      "micro": "conceptual-embedded",
+      "relationships": "missing",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Grouped with seminiferous-tubule detail part"
+    },
+    {
+      "structure": "Round ligament of uterus",
+      "featureIds": [
+        "ANAT-3942",
+        "ANAT-3943",
+        "ANAT-3944",
+        "ANAT-3945",
+        "ANAT-3946",
+        "ANAT-3947",
+        "ANAT-3948"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Shares combined uterine-support ligament part"
+    },
+    {
+      "structure": "Scrotal layers",
+      "featureIds": [
+        "ANAT-3837",
+        "ANAT-3838",
+        "ANAT-3839",
+        "ANAT-3840",
+        "ANAT-3841",
+        "ANAT-3842",
+        "ANAT-3843"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "missing",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Concentric gross and dedicated-detail scrotal wall layers"
+    },
+    {
+      "structure": "Seminal vesicles",
+      "featureIds": [
+        "ANAT-3788",
+        "ANAT-3789",
+        "ANAT-3790",
+        "ANAT-3791",
+        "ANAT-3792",
+        "ANAT-3793",
+        "ANAT-3794"
+      ],
+      "gross": "independent",
+      "detail": "grouped",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Bilateral gross meshes; detail grouped with ejaculatory ducts"
+    },
+    {
+      "structure": "Seminiferous tubules",
+      "featureIds": [
+        "ANAT-3753",
+        "ANAT-3754",
+        "ANAT-3755",
+        "ANAT-3756",
+        "ANAT-3757",
+        "ANAT-3758",
+        "ANAT-3759"
+      ],
+      "gross": "missing",
+      "detail": "independent",
+      "micro": "independent",
+      "relationships": "missing",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Multiple selectable-detail tubes share seminiferous parent part"
+    },
+    {
+      "structure": "Spermatic cord",
+      "featureIds": [
+        "ANAT-3781",
+        "ANAT-3782",
+        "ANAT-3783",
+        "ANAT-3784",
+        "ANAT-3785",
+        "ANAT-3786",
+        "ANAT-3787"
+      ],
+      "gross": "missing",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Combined with ductus deferens; cord contents not separated"
+    },
+    {
+      "structure": "Suspensory ligament of ovary",
+      "featureIds": [
+        "ANAT-3956",
+        "ANAT-3957",
+        "ANAT-3958",
+        "ANAT-3959",
+        "ANAT-3960",
+        "ANAT-3961",
+        "ANAT-3962"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "partial",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Ligament and ovarian-vessel relation shown but share grouped parts"
+    },
+    {
+      "structure": "Testis",
+      "featureIds": [
+        "ANAT-3732",
+        "ANAT-3733",
+        "ANAT-3734",
+        "ANAT-3735",
+        "ANAT-3736",
+        "ANAT-3737",
+        "ANAT-3738"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "independent",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Bilateral gross testes and dedicated testicular detail volumes"
+    },
+    {
+      "structure": "Tunica albuginea",
+      "featureIds": [
+        "ANAT-3746",
+        "ANAT-3747",
+        "ANAT-3748",
+        "ANAT-3749",
+        "ANAT-3750",
+        "ANAT-3751",
+        "ANAT-3752"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "missing",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Mentioned and represented within combined tunica/testis or penis parts"
+    },
+    {
+      "structure": "Tunica vaginalis",
+      "featureIds": [
+        "ANAT-3739",
+        "ANAT-3740",
+        "ANAT-3741",
+        "ANAT-3742",
+        "ANAT-3743",
+        "ANAT-3744",
+        "ANAT-3745"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "missing",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Represented within combined testis-and-tunica part"
+    },
+    {
+      "structure": "Umbilical cord",
+      "featureIds": [
+        "ANAT-3970",
+        "ANAT-3971",
+        "ANAT-3972",
+        "ANAT-3973",
+        "ANAT-3974",
+        "ANAT-3975",
+        "ANAT-3976"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "partial",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Separate pregnancy-state cord with Wharton-jelly sheath and three vessels"
+    },
+    {
+      "structure": "Uterine tube",
+      "featureIds": [
+        "ANAT-3858",
+        "ANAT-3859",
+        "ANAT-3860",
+        "ANAT-3861",
+        "ANAT-3862",
+        "ANAT-3863",
+        "ANAT-3864"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Bilateral gross and dedicated tube/fimbria detail geometry"
+    },
+    {
+      "structure": "Uterus",
+      "featureIds": [
+        "ANAT-3872",
+        "ANAT-3873",
+        "ANAT-3874",
+        "ANAT-3875",
+        "ANAT-3876",
+        "ANAT-3877",
+        "ANAT-3878"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "partial",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Gross uterine mesh and layered dedicated uterine detail scene"
+    },
+    {
+      "structure": "Vagina",
+      "featureIds": [
+        "ANAT-3900",
+        "ANAT-3901",
+        "ANAT-3902",
+        "ANAT-3903",
+        "ANAT-3904",
+        "ANAT-3905",
+        "ANAT-3906"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Gross canal and dedicated vaginal/fornix detail geometry"
+    },
+    {
+      "structure": "Vulva",
+      "featureIds": [
+        "ANAT-3907",
+        "ANAT-3908",
+        "ANAT-3909",
+        "ANAT-3910",
+        "ANAT-3911",
+        "ANAT-3912",
+        "ANAT-3913"
+      ],
+      "gross": "independent",
+      "detail": "independent",
+      "micro": "missing",
+      "relationships": "partial",
+      "neurovascular": "missing",
+      "lymphatics": "missing",
+      "validation": "pending",
+      "evidence": "Labia majora/minora, vestibule, clitoris, bulbs and greater vestibular glands are separated"
+    }
+  ]
+}

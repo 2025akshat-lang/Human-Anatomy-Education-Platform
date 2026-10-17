@@ -114,16 +114,6 @@ export default function App() {
         )}
         {!cleanView && (
           <>
-            <div className="interaction-hint">
-              <Icon name="focus" size={14} />
-              Tap a structure · tap again for cutaway · select a component for
-              micro view
-            </div>
-            <div className="model-disclosure">
-              <Icon name="info" size={14} />
-              Procedural educational geometry · sex morphology and validation
-              pending
-            </div>
           </>
         )}
       </section>

@@ -16,3 +16,16 @@ Kya badla (sirf 4 jagah):
  3. routing regex me |Ejaculatory|testicular artery add (1 line).
  4. cutaway title: sagittal -> anterior educational plate (1 line).
 Mesh names purane hi rakhe (quiz/routing na toote). Micro codes rt, rp same.
+EYE PATCH v7 (male + spine patch ke upar; final html me teeno included)
+
+Option A (easy): human-atlas-3d.html ko public/ aur gh-pages dono me replace karo.
+Option B (split): python3 apply_eye_patch.py public/human-atlas-3d.html -> human-atlas-3d.eye.html
+  (sirf code ADD hota hai, purana eye code same rehta hai; Eye mesh par openDV ko wrap karta hai)
+
+Files:
+ 05-eye-core-root.js : nested navigation (EYX), Light toggle, root scene (OFF = bahar se aankh, ON = cross-section + rays)
+ 06-eye-anterior.js  : cornea > stroma | iris > light reflex | lens > aqueous (glaucoma)
+ 07-eye-retina.js    : retina > rod > cascade | retina > ON/OFF | fundus (blind spot) > visual pathway
+ 08-eye-orbit.js     : extraocular muscles + nerves > orbit bones
+
+Kaise chalta hai: part select karo, info card me "Open inside" dabao -> next level. X button ek level peeche.

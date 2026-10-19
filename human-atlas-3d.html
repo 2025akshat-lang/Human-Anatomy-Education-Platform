@@ -72,11 +72,31 @@ bn(sp(.3),0,8.3,.3,'Face bones (14)','Maxilla x2, Zygomatic x2, Nasal x2, Lacrim
 bn(bx(.5,.12,.4),0,8.0,.28,'Mandible','Only movable skull bone. Largest and strongest facial bone.');
 bn(new T.TorusGeometry(.12,.025,6,12,Math.PI),0,7.85,.12,'Hyoid','U-shaped; only bone that does not articulate with any other bone.',{r:[Math.PI/2,0,0]});
 [-1,1].forEach(s=>bn(sp(.045),s*.52,8.6,0,'Ear ossicles (6)','Malleus, Incus, Stapes (x2). Stapes = smallest bone of body.'));
+/* ---- SPINE v6: natural sagittal curvature + tilted vertebrae ----
+   spZ(y)   = z of vertebral-body centre (cervical lordosis, thoracic kyphosis, lumbar lordosis)
+   spTilt   = body/endplate tilt following the curve (x2.2 so it is visible)
+   canalZ   = z of the vertebral canal centre (spinal cord + arch rings follow it)
+   Every piece of one vertebra shares the SAME name, so quiz / routing / detail view still work. */
+const spZ=y=>-.12+.08*Math.exp(-Math.pow((y-7.4)/.55,2))-.06*Math.exp(-Math.pow((y-5.9)/.9,2))+.09*Math.exp(-Math.pow((y-4.6)/.5,2));
+const spTilt=y=>Math.atan((spZ(y+.05)-spZ(y-.05))/.1)*2.2;
+const spR=y=>{const c=t=>Math.max(0,Math.min(1,t));return .1+.03*c((7.0-y)/.4)+.04*c((5.1-y)/.4)};
+const canalZ=y=>spZ(y)-(.8*spR(y)+.055);
 for(let i=0;i<24;i++){
  const y=i<7?7.75-i*.12:i<19?6.85-(i-7)*.15:4.95-(i-19)*.17,r=i<7?.1:i<19?.13:.17;
  const n=i<7?'Cervical C'+(i+1):i<19?'Thoracic T'+(i-6):'Lumbar L'+(i-18);
  const inf=i==0?'Atlas: no body, no spinous process; carries the skull.':i==1?'Axis: has dens (odontoid process); head rotates here.':i==6?'Vertebra prominens (C7), palpable at neck base.':i<7?'Cervical: 7 vertebrae, transverse foramen present.':i<19?'Thoracic: 12 vertebrae, costal facets for ribs.':'Lumbar: 5 vertebrae, largest bodies, no costal facets.';
- bn(cy(r,.1),0,y,-.12,n,inf)}
+ const z=spZ(y),th=spTilt(y),zc=canalZ(y),cer=i<7,tho=i>=7&&i<19;
+ /* body (wider than deep, tilted with the curve) */
+ bn(new T.CylinderGeometry(r,r*.95,.1,18),0,y,z,n,inf,{s:[1.1,1,.8],r:[th,0,0]});
+ /* neural arch ring around the canal (cord passes through it) */
+ bn(new T.TorusGeometry(.075,.02,6,16),0,y,zc,n,inf,{r:[Math.PI/2+th,0,0]});
+ /* spinous process: short/horizontal cervical, long + steeply down thoracic, stout horizontal lumbar */
+ if(i>0){const L=cer?(i==6?.2:i==1?.16:.12):tho?.2:.14,ph=cer?(i==6?1.15:1.3):tho?(i<10?.75:i<16?.3:.6):1.4;
+  bn(new T.CylinderGeometry(.022,.012,L,8),0,y-Math.cos(ph)*L/2,zc-.095-Math.sin(ph)*L/2,n,inf,{r:[ph,0,0]})}
+ /* transverse processes */
+ const lt=cer?.13:tho?.22:.24;
+ [-1,1].forEach(s=>bn(new T.CylinderGeometry(.014,.02,lt,8),s*(.08+lt/2),y,zc+.02,n,inf,{r:[0,0,Math.PI/2]}));
+}
 bn(new T.ConeGeometry(.28,.7,6),0,3.65,-.12,'Sacrum','5 fused vertebrae (S1-S5), triangular.',{r:[Math.PI,0,0]});
 bn(new T.ConeGeometry(.07,.3,6),0,3.15,-.1,'Coccyx','3-5 fused vertebrae; vestigial tail.',{r:[Math.PI,0,0]});
 const RG=new T.Group();RG.position.z=.22;G.bones.add(RG);
@@ -447,10 +467,10 @@ const levator=new T.Mesh(new T.TorusGeometry(.28,.055,10,30,Math.PI),xm('sk',2))
 xms('Coccygeus (right)','Ischial spine to lower sacrum and coccyx; completes posterior pelvic diaphragm.',[-.28,3.32,-.22],[-.08,3.18,-.3],.045,.025,{n:[0,0,-1]});
 xms('Coccygeus (left)','Ischial spine to lower sacrum and coccyx; completes posterior pelvic diaphragm.',[.28,3.32,-.22],[.08,3.18,-.3],.045,.025,{n:[0,0,-1]});
 tb(G.organs,[[-.45,3.4,.15],[-.4,3.25,.2],[-.36,3.18,.15]],0xb8795a,.018,'Vermiform appendix','Narrow blind tube on caecum with lymphoid tissue; appendicitis pain at McBurney point.');
-const cordPath=[[0,8.18,-.1],[0,7.7,-.18],[0,7.05,-.28],[0,6.35,-.25],[0,5.65,-.17],[0,5.05,-.22]],cordZ=y=>{for(let i=0;i<cordPath.length-1;i++){const a=cordPath[i],b=cordPath[i+1];if(y<=a[1]&&y>=b[1])return a[2]+(b[2]-a[2])*(a[1]-y)/(a[1]-b[1])}return cordPath[cordPath.length-1][2]},SCM=tb(G.organs,cordPath,0xf3e8c8,.035,'Spinal cord','Follows the natural sagittal curvature of the vertebral canal from medulla to conus at L1-L2; 31 pairs of roots emerge segmentally.');SCM.material.emissive.setHex(0x6fc8ff);SCM.material.emissiveIntensity=.28;
+const cordPath=[[0,8.18,-.1]].concat([7.7,7.05,6.35,5.65,5.05].map(y=>[0,y,canalZ(y)])),cordZ=y=>{for(let i=0;i<cordPath.length-1;i++){const a=cordPath[i],b=cordPath[i+1];if(y<=a[1]&&y>=b[1])return a[2]+(b[2]-a[2])*(a[1]-y)/(a[1]-b[1])}return cordPath[cordPath.length-1][2]},SCM=tb(G.organs,cordPath,0xf3e8c8,.035,'Spinal cord','Follows the natural sagittal curvature of the vertebral canal from medulla to conus at L1-L2; 31 pairs of roots emerge segmentally.');SCM.material.emissive.setHex(0x6fc8ff);SCM.material.emissiveIntensity=.28;
 for(let k=0;k<8;k++)tb(G.organs,[[0,5.05,cordZ(5.05)],[(k-3.5)*.012,4.55,-.21+(k%2)*.01],[(k-3.5)*.035,3.8,-.18+(k%3)*.015]],0xf3e8c8,.006,'Cauda equina','Horse-tail bundle of lumbar + sacral nerve roots continuous with the conus below L1-L2; lumbar puncture is done at L3-L4.');
 const xY=i=>i<7?7.75-i*.12:i<19?6.85-(i-7)*.15:4.95-(i-19)*.17;
-for(let i=1;i<24;i++)mk(G.bones,cy((i<7?.1:i<19?.13:.17)*1.12,.035),0x8fb8d0,0,i<23?(xY(i)+xY(i+1))/2:4.12,-.12,'Intervertebral disc','Fibrocartilage: tough annulus fibrosus + gel-like nucleus pulposus; shock absorber. 23 discs (none between C1-C2). Slipped disc presses on spinal nerves.');
+for(let i=1;i<24;i++){const ym=i<23?(xY(i)+xY(i+1))/2:4.12;mk(G.bones,cy((i<7?.1:i<19?.13:.17)*1.12,.035),0x8fb8d0,0,ym,spZ(ym),'Intervertebral disc','Fibrocartilage: tough annulus fibrosus + gel-like nucleus pulposus; shock absorber. 23 discs (none between C1-C2). Slipped disc presses on spinal nerves.',{s:[1.1,1,.8],r:[spTilt(ym),0,0]})}
 /* cardiac + smooth muscle layers */
 CM=new T.Mesh(HM.geometry,xm('ca',3));CM.position.copy(HM.position);CM.rotation.copy(HM.rotation);CM.scale.setScalar(1.07);
 xa(CM,'Myocardium (cardiac muscle)','Thick muscular wall of the heart (left ventricle thickest). Branched, interconnected cells let the heart contract as one unit; own pacemaker (SA node). Beats ~72/min for life.','ca',.55);
@@ -1606,6 +1626,49 @@ fin('Tooth micro view','Enamel rods > DEJ > dentinal tubules > pulp',8,16);tg.se
 
 
 
+/* ---- v6: vertebra zoom view (golden bone, tilted superior view, cord ring in the canal) ---- */
+window.openVT=m=>{init();cur=m;live=false;ret=null;reset();kind='vt';curV=()=>openVT(m);
+const n=m.userData.name,ty=n[0]=='C'?'c':n[0]=='T'?'t':'l',num=+n.replace(/\D+/g,''),sp0=$('#scalePath');if(sp0)sp0.textContent='BODY / VERTEBRAL COLUMN / '+n.toUpperCase();
+const GOLD=0xdcc58a,GOLD2=0xd2b978,FAC=0xf5f2e6,
+ D={c:{rx:.5,rz:.38,h:.3,cr:.36,sl:.5,sd:.08,tp:.5},t:{rx:.62,rz:.52,h:.4,cr:.3,sl:.85,sd:.55,tp:.75},l:{rx:.85,rz:.62,h:.52,cr:.34,sl:.55,sd:.04,tp:.85}}[ty],
+ {rx,rz,h,cr,sl,sd,tp}=D,bz=cr+rz*.85,tz=-cr*.35,jx=cr+.08,
+ T_={c:['Small, wide body; uncinate processes form uncovertebral joints. Carries head + neck load.','Short and bifid (C2-C6); C7 is long and palpable (vertebra prominens).','Facets lie ~45 degrees: allow flexion, extension, lateral flexion and rotation (most mobile region).','Large triangular canal: houses the cervical enlargement of the cord (C4-T1).'],
+  t:['Heart-shaped, medium body with demi-facets for rib heads; wedging adds to thoracic kyphosis.','Long and steeply angled downward, overlapping the vertebra below like roof tiles; limits extension.','Facets are nearly coronal: favour rotation and lateral flexion, limit flexion/extension.','Small round canal, the narrowest region: cord injury risk is highest here.'],
+  l:['Largest, kidney-shaped body: bears most body weight; discs L4-L5 and L5-S1 herniate most often.','Short, thick and horizontal (hatchet-shaped); gap between them is used for lumbar puncture.','Facets are sagittal and interlocking: allow flexion/extension, strongly resist rotation.','Triangular canal: below L1-L2 it holds the cauda equina, not the cord.']}[ty],
+ PB=part('Vertebral body',T_[0],1),PP=part('Pedicles','Short bars joining body to the arch; the notches above and below them form the intervertebral foramen for the spinal nerve.',1),
+ PL=part('Laminae','Flat plates that roof the canal; ligamentum flavum joins adjacent laminae. Removed in laminectomy.',1),
+ PS=part('Spinous process',T_[1],1),PT=part('Transverse processes','Lever arms for muscles and ligaments'+(ty=='t'?'; carry costal facets for rib tubercles.':ty=='c'?'; contain the transverse foramen for the vertebral artery.':'; thick and long for psoas and erector spinae attachment.'),1),
+ PF=part('Articular processes (facets)',T_[2],1),PC=part('Vertebral canal, cord and meninges',(ty=='l'&&num>2?'Lumbar canal: cauda equina roots float in CSF inside the dural sac (red ring).':T_[3]+' Red ring = dura mater; cream centre = spinal cord.'),1),
+ PN=part('Spinal nerve root','Dorsal (sensory) + ventral (motor) roots fuse and leave through the intervertebral foramen. Disc herniation or foraminal narrowing compresses it.',1),
+ PD=part('Intervertebral disc','Annulus fibrosus (tough rings) around a gel-like nucleus pulposus; shock absorber that joins this body to the next.',1);
+let PCF=null,PTF=null;if(ty=='t')PCF=part('Costal facets (rib articulation)','Demi-facets on the body and a facet on each transverse process articulate with rib head and rib tubercle.',1);if(ty=='c')PTF=part('Transverse foramen + vertebral artery','Cervical vertebrae (C1-C6) have a foramen in each transverse process; the vertebral artery (red) ascends through them to the brain.',1);
+/* body + rims + disc */
+add(new T.CylinderGeometry(1,1,h,44),GOLD,0,0,bz,{s:[rx,1,rz],op:.97},PB);
+[1,-1].forEach(k=>add(new T.TorusGeometry(1,.07,10,44),GOLD2,0,k*h/2,bz,{s:[rx,rz,1],r:[Math.PI/2,0,0],op:.97},PB));
+add(new T.CylinderGeometry(1,1,.14,44),0x8fb8d0,0,-h/2-.09,bz,{s:[rx*1.04,1,rz*1.04],op:.5},PD);add(new T.SphereGeometry(1,24,16),0xe7f1f6,0,-h/2-.09,bz,{s:[rx*.5,.07,rz*.5],op:.55},PD);
+/* arch */
+[-1,1].forEach(s=>{
+ tube([[s*cr*.8,0,cr*.8],[s*(cr*.95),0,cr*.3],[s*jx,0,tz]],.09,GOLD,PP,.97);
+ tube([[s*jx,0,tz],[s*cr*.75,0,-cr*.9],[s*.06,0,-cr-.1]],.085,GOLD,PL,.97);
+ tube([[s*jx,0,tz],[s*(jx+tp*.5),.02,tz-.15],[s*(jx+tp),.04,tz-.3]],.075,GOLD2,PT,.97);add(new T.SphereGeometry(.1,14,10),GOLD2,s*(jx+tp),.04,tz-.3,{op:.97},PT);
+ add(new T.SphereGeometry(1,16,12),GOLD,s*cr*.78,.14,-cr*.62,{s:[.12,.1,.13],op:.97},PF);add(new T.SphereGeometry(1,18,12),FAC,s*cr*.78,.23,-cr*.62,{s:[.14,.03,.17],r:[ty=='t'?-.5:0,0,s*(ty=='l'?.5:.1)],op:.97},PF);
+ add(new T.SphereGeometry(1,18,12),FAC,s*.17,-.2,-cr-.05,{s:[.12,.03,.14],op:.97},PF);
+ tube([[s*cr*.5,.0,0],[s*(cr+.3),-.12,.05],[s*(cr+.8),-.3,.25]],.04,0xe0d870,PN,.96);for(let k=-1;k<2;k++)tube([[s*cr*.4,0,k*.05],[s*(cr+.2),-.08,k*.06],[s*(cr+.45),-.18,.1+k*.05]],.012,0xe8e48a,PN,.9);
+ if(ty=='t'){add(new T.SphereGeometry(1,16,12),FAC,s*(rx*.92),.06,bz-rz*.4,{s:[.05,.1,.12],op:.98},PCF);add(new T.SphereGeometry(1,16,12),FAC,s*(jx+tp),.04,tz-.4,{s:[.07,.05,.07],op:.98},PCF)}
+ if(ty=='c'){add(new T.TorusGeometry(.07,.02,8,14),0x7a6a3a,s*(jx+tp*.55),-.0,tz-.06,{r:[Math.PI/2,0,0],op:.9},PTF);add(new T.CylinderGeometry(.045,.045,.55,12),0xd8232f,s*(jx+tp*.55),.05,tz-.06,{op:.92},PTF)}
+});
+/* spinous process: down and back */
+tube([[0,0,-cr-.1],[0,-sd*.5,-cr-.1-sl*.5],[0,-sd,-cr-.1-sl]],.07,GOLD2,PS,.97);add(new T.SphereGeometry(.09,14,10),GOLD2,0,-sd,-cr-.1-sl,{op:.97},PS);
+if(ty=='c'){add(new T.SphereGeometry(.07,12,8),GOLD2,.07,-sd,-cr-.1-sl,{op:.97},PS);add(new T.SphereGeometry(.07,12,8),GOLD2,-.07,-sd,-cr-.1-sl,{op:.97},PS)}
+/* canal: black lumen, red dura ring, cord (or cauda equina) */
+add(new T.CylinderGeometry(cr*.97,cr*.97,.04,40),0x0a0a10,0,-.09,0,{op:.97},PC);
+add(new T.TorusGeometry(cr*.68,.05,12,44),0xe8353d,0,.0,0,{r:[Math.PI/2,0,0],op:.97},PC);
+if(ty=='l'&&num>2){const rn=RN(7);for(let k=0;k<9;k++){const a=k/9*6.28,rr=cr*.3*(.4+rn()*.6);add(new T.SphereGeometry(.05,10,8),0xf3e8c8,Math.cos(a)*rr,.0,Math.sin(a)*rr*.9,{op:.97},PC)}}
+else add(new T.CylinderGeometry(cr*.5,cr*.5,.12,36),0xf3e8c8,0,.0,0,{s:[ty=='c'?1.15:1,1,ty=='c'?.8:1],op:.97},PC);
+lab([['Body',[0,h/2+.15,bz+rz*.5]],['Spinal cord + dura',[0,.3,0]],['Pedicle',[-cr-.1,.2,cr*.5]],['Lamina',[-cr*.8,.2,-cr-.05]],['Spinous process',[0,.2,-cr-.1-sl]],['Transverse process',[jx+tp,.3,tz-.3]],['Facet',[cr*.78+.15,.35,-cr*.62]],['Nerve root',[-(cr+.55),-.45,.2]]].concat(ty=='c'?[['Transverse foramen',[-(jx+tp*.55),.35,tz]]]:ty=='t'?[['Costal facet',[rx+.2,.3,bz-rz*.4]]]:[]),'#e8d28a');
+fin(n+': zoomed vertebra','Superior view, tilted | golden bone, red dura ring, cord, nerve roots | part par tap karein',3.6,5.8);
+tg.set(0,-.1,.2);tth=th=.4;tel=el=.85};
+{const _o3=window.openDV;window.openDV=(m,lv)=>/^(Cervical C|Thoracic T|Lumbar L)\d+$/.test(m.userData.name)?openVT(m):_o3(m,lv)}
 })();
 /* ---- CAPTION + DRAG ---- */
 let CAP=true;const DET='Detail mode: internal composition and flow relationships.',LIVE='Live: Heart 72 bpm, Lungs 15/min. Muscles ON: biceps contracts, triceps relaxes';

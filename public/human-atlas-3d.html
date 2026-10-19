@@ -1669,6 +1669,468 @@ lab([['Body',[0,h/2+.15,bz+rz*.5]],['Spinal cord + dura',[0,.3,0]],['Pedicle',[-
 fin(n+': zoomed vertebra','Superior view, tilted | golden bone, red dura ring, cord, nerve roots | part par tap karein',3.6,5.8);
 tg.set(0,-.1,.2);tth=th=.4;tel=el=.85};
 {const _o3=window.openDV;window.openDV=(m,lv)=>/^(Cervical C|Thoracic T|Lumbar L)\d+$/.test(m.userData.name)?openVT(m):_o3(m,lv)}
+/* ---- v7 EYE: nested atlas (core + root) ----
+   Tree:  Eye(root) -> cornea -> stroma | iris -> plr | lens -> aqueous | retina -> photo -> cascade | onoff
+                    -> fundus(optic disc) -> nerve(visual pathway) | muscles -> orbit
+   A part with micro-code 'E:<id>' opens node <id>. The X button walks back up the stack. */
+const EYX={N:{},st:[],on:false,br:true,lt:true,btn:{}};
+{
+EYX.ctx=()=>{const EG=new T.Group();G2.add(EG);const por=innerWidth/innerHeight<.8;
+ const ad=(g,col,x,y,z,o,P)=>add(g,col,x,y,z,Object.assign({},o||{},{g:EG}),P),
+  tb=(pts,r,col,P,op)=>add(new T.TubeGeometry(new T.CatmullRomCurve3(pts.map(V3)),Math.max(10,pts.length*8),r,8),col,0,0,0,{op:op||.9,g:EG},P),
+  sp=(x,y,z,sx,sy,sz,col,P,op)=>ad(new T.SphereGeometry(1,22,16),col,x,y,z,{s:[sx,sy||sx,sz||sx],op:op||.92},P),
+  bx=(x,y,z,w,h,d,col,P,op,r)=>ad(new T.BoxGeometry(w,h,d),col,x,y,z,{op:op||.9,r},P),
+  cy=(x,y,z,r,h,col,P,op,rot)=>ad(new T.CylinderGeometry(r,r,h,22),col,x,y,z,{op:op||.9,r:rot},P),
+  dc=(geo,col,x,y,z,o)=>{o=o||{};const m=new T.Mesh(geo,new T.MeshStandardMaterial({color:col,roughness:.45,transparent:true,opacity:o.op||.8,side:T.DoubleSide,depthWrite:false}));m.position.set(x,y,z);if(o.s)m.scale.set(...o.s);if(o.r)m.rotation.set(...o.r);EG.add(m);return m},
+  lb=(arr,col)=>{EG.updateMatrixWorld(true);lab(arr.map(a=>[a[0],EG.localToWorld(new T.Vector3(a[1][0],a[1][1],a[1][2])).toArray()]),col||'#ffe36a')},
+  poly=pts=>{const cp=new T.CurvePath();for(let i=0;i<pts.length-1;i++)cp.add(new T.LineCurve3(V3(pts[i]),V3(pts[i+1])));return cp},
+  txt=s=>{if(txt.l!==s){txt.l=s;const e=$('#ph');if(e)e.textContent=s}};
+ return {EG,por,ad,tb,sp,bx,cy,dc,lb,poly,txt}};
+EYX.show=id=>{init();reset();ret=null;live=false;kind='ey_'+id;EYX.btn={};EYX.lp='';const c=EYX.ctx(),o=EYX.N[id][1](c);
+ fin(o.t,o.s,o.rd||5,o.rm||8);tg.set(...(o.tg||[0,0,0]));const cm=o.cam||[0,.12];tth=th=cm[0];tel=el=cm[1];
+ if(o.ex)$('#dl').insertAdjacentHTML('afterbegin',o.ex);
+ const s0=$('#scalePath');if(s0)s0.textContent='BODY / '+EYX.st.map(k=>EYX.N[k][0]).join(' / ').toUpperCase();
+ curV=()=>EYX.show(id);ret=EYX.st.length>1?EYX.back:null};
+EYX.go=id=>{EYX.st.push(id);EYX.show(id)};EYX.back=()=>{EYX.st.pop();EYX.show(EYX.st[EYX.st.length-1])};
+$('#dl').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&EYX.btn[b.id]){e.stopPropagation();EYX.btn[b.id](b)}},true);
+$('#dn').addEventListener('click',e=>{if(e.target.id=='mv'&&selP&&/^E:/.test(selP.v||'')){e.stopPropagation();EYX.go(selP.v.slice(2))}},true);
+new MutationObserver(()=>{const b=$('#mv');if(b&&selP&&/^E:/.test(selP.v||''))b.textContent='Open inside \u25B8'}).observe($('#dn'),{childList:true});
+{const _o4=window.openDV;window.openDV=(m,lv)=>{if(m.userData.name!=='Eye')return _o4(m,lv);init();cur=m;EYX.st=['root'];EYX.on=!!lv;EYX.br=true;EYX.show('root')}}
+
+/* ---------- ROOT: external eye (light OFF)  /  cross-section + light rays (light ON) ---------- */
+EYX.N.root=['Eye',c=>{
+ const {ad,tb,sp,bx,dc,lb,poly,txt,EG}=c,on=EYX.on,
+  ex='<button id="eylt" class="'+(on?'on':'')+'">Light: '+(on?'ON':'OFF')+'</button>'+(on?'<button id="eybr" class="on">'+(EYX.br?'Bright':'Dim')+'</button>':'');
+ EYX.btn.eylt=()=>{EYX.on=!EYX.on;EYX.show('root')};
+ EYX.btn.eybr=b=>{EYX.br=!EYX.br;b.textContent=EYX.br?'Bright':'Dim'};
+ const PM=part('Extraocular muscles (6)','Four recti + two obliques rotate the globe (LR6 SO4 AO3: lateral rectus CN VI, superior oblique CN IV, all others CN III). Tap to open muscles, nerves and orbit.',1,'E:muscles');
+ if(!on){
+  const PS=part('Sclera','White fibrous coat (collagen): keeps the shape, anchors the six extraocular muscles; continuous with the cornea at the limbus.',1);sp(0,0,0,1,1,1,0xf2eee6,PS,.98);
+  const PC=part('Cornea','Clear avascular dome (~43 D, two thirds of focusing power), most sensitive tissue of the body (CN V1). Tap to open its 5 layers.',1,'E:cornea');
+  ad(new T.SphereGeometry(.62,32,16,0,6.2832,0,.9),0xcfe8ff,0,0,.5,{op:.3,r:[Math.PI/2,0,0]},PC);
+  const PI=part('Iris + pupil','Coloured muscular diaphragm: sphincter pupillae (constricts, CN III) and dilator pupillae (dilates, sympathetic). Pupil 2 mm bright / 8 mm dark. Tap to open.',1,'E:iris');
+  ad(new T.CircleGeometry(.47,48),0x4aa3a8,0,0,.8,{op:.97},PI);
+  const go=ad(new T.RingGeometry(1,1.45,48),0xd9a441,0,0,.805,{op:.97},PI),pu=ad(new T.CircleGeometry(1,40),0x050507,0,0,.81,{op:1},PI);
+  go.scale.set(.28,.28,1);pu.scale.set(.28,.28,1);
+  for(let k=0;k<28;k++){const a=k/28*6.283;ad(new T.BoxGeometry(.006,.2,.002),0x2f7f86,Math.cos(a)*.34,Math.sin(a)*.34,.802,{op:.8,r:[0,0,a-1.5708]},PI)}
+  const PN=part('Optic nerve (CN II)','Bundle of ~1.2 million ganglion-cell axons leaving the back of the eye; carries vision to the brain. Tap to follow the visual pathway.',1,'E:nerve');
+  tb([[0,0,-.98],[0,-.05,-1.6],[0,-.1,-2.3]],.1,0xf2e08a,PN,.95);
+  [0,1.5708,3.1416,4.7124].forEach(m=>{const p=[];for(let a=2.3;a>=.95;a-=.2)p.push([1.06*Math.sin(a)*Math.cos(m),1.06*Math.sin(a)*Math.sin(m),1.06*Math.cos(a)]);tb(p,.07,0xc0504a,PM,.92)});
+  lb([['Sclera',[.95,.55,.3]],['Cornea',[-.55,.62,1.1]],['Iris + pupil',[0,-.58,.9]],['Optic nerve',[.15,.4,-1.8]],['Rectus muscle',[.9,-.2,-.6]]]);
+  txt('Roshni OFF: bahar se aankh. "Light" dabao: cross-section + roshni ka raasta');
+  return {t:'Eye: external view',s:'Light button: cross-section + light | part par tap karein',rd:3.4,rm:5.2,cam:[0,.1],tg:[0,0,.2],ex}}
+ /* ---- light ON: horizontal cross-section, axis along x (rotated to vertical on phones) ---- */
+ EG.rotation.z=c.por?-1.5708:0;
+ const arc=(R,a0,a1,n)=>{const p=[];for(let i=0;i<=n;i++){const t=(a0+(a1-a0)*i/n)*Math.PI/180;p.push([R*Math.cos(t),R*Math.sin(t),0])}return p},
+  PS=part('Sclera','White collagen coat; muscles insert here. Continues as the cornea in front.',1),
+  PCH=part('Choroid (vascular layer)','Dark vessel-rich layer: nourishes the outer retina, absorbs stray light. With ciliary body + iris = uvea.',1),
+  PR=part('Retina','Neural layer: ~120 million rods + ~6 million cones. Light passes through ALL layers to reach the photoreceptors at the back. Tap to open the layers.',1,'E:retina'),
+  PC=part('Cornea','Transparent dome, ~43 D: bends light most. Tap for the 5 layers.',1,'E:cornea'),
+  PI=part('Iris + pupil','Pupil 2 mm (bright) to 8 mm (dim): see the rays get blocked by the iris. Tap for the muscles.',1,'E:iris'),
+  PL=part('Lens','Biconvex, elastic (~17 D); changes shape for near vision. Tap for accommodation.',1,'E:lens'),
+  PCB=part('Ciliary body + zonules','Ciliary muscle + processes: make aqueous humour and pull on the zonules to reshape the lens. Tap for aqueous drainage.',1,'E:aqueous'),
+  PAQ=part('Aqueous humour','Clear fluid in the anterior + posterior chambers; drains through the trabecular meshwork. Blocked drainage = glaucoma.',1,'E:aqueous'),
+  PV=part('Vitreous humour','Clear gel (~80% of the globe) holding the retina against the choroid. Floaters = drifting clumps.',1),
+  PF=part('Fovea (macula)','Central pit: only cones, sharpest vision (visual axis). Macular degeneration = loss of central vision.',1,'E:fundus'),
+  PD=part('Optic disc (blind spot)','Axons leave and vessels enter here; NO photoreceptors = blind spot ~15 degrees temporal to fixation. Tap for the fundus view.',1,'E:fundus'),
+  PO=part('Object + light rays','Each object point sends rays; cornea + lens bend them to ONE point on the retina: a real, inverted, reversed image (the brain re-inverts it).',1);
+ tb(arc(1,-146,146,40),.035,0xf2eee6,PS,.98);tb(arc(.955,-128,128,36),.025,0x6a2f2a,PCH,.85);tb(arc(.915,-118,118,36),.03,0xe8a0a0,PR,.92);
+ tb([[-.829,.559,0],[-.915,.3,0],[-.96,0,0],[-.915,-.3,0],[-.829,-.559,0]],.03,0xbfe6ff,PC,.65);
+ sp(.08,0,0,.86,.86,.55,0xdff0ff,PV,.14);sp(-.74,0,0,.2,.5,.3,0xbfe8ff,PAQ,.25);sp(-.45,0,0,.13,.27,.22,0xf5e8b0,PL,.8);
+ [1,-1].forEach(s=>{sp(-.46,s*.64,0,.14,.1,.1,0x9a6a4a,PCB,.95);tb([[-.46,s*.58,0],[-.45,s*.27,0]],.006,0xe8e0c8,PCB,.9)});
+ const iu=bx(-.6,.3,0,.04,1,.12,0x4aa3a8,PI,.96),idn=bx(-.6,-.3,0,.04,1,.12,0x4aa3a8,PI,.96);
+ sp(.915,0,0,.03,.03,.03,0xf2d65a,PF,1);sp(.875,-.267,0,.05,.05,.05,0xf2e08a,PD,1);
+ tb([[.88,-.27,0],[1.35,-.4,0],[1.95,-.5,0]],.1,0xf2e08a,PD,.95);
+ const PN=part('Optic nerve (CN II)','Leaves the globe nasal to the fovea; ~1.2 million axons. Tap to follow the visual pathway.',1,'E:nerve');tb([[1.5,-.43,0],[1.95,-.5,0],[2.3,-.55,0]],.11,0xf2e08a,PN,.95);
+ tb([[1.7,.62,0],[1.0,.98,0],[.3,1.1,0],[-.2,1.03,0],[-.55,.86,0]],.07,0xc0504a,PM,.9);tb([[1.7,-.85,0],[1.0,-1.0,0],[.3,-1.08,0],[-.2,-1.0,0],[-.5,-.87,0]],.07,0xc0504a,PM,.9);
+ tb([[-3,-.35,0],[-3,.35,0]],.02,0xffe36a,PO,1);ad(new T.ConeGeometry(.07,.16,12),0xffe36a,-3,.43,0,{op:1},PO);
+ /* rays: 2 source points x 6 aperture heights; rays outside the pupil stop at the iris */
+ const SRC=[[.35,0xffe36a],[-.35,0xff9f43]],HL=[-.5,-.3,-.1,.1,.3,.5],rays=[],img=[];
+ SRC.forEach(([sy,col])=>{const Iy=-sy*.45,Ix=Math.sqrt(.915*.915-Iy*Iy);img.push([Ix,Iy,col]);
+  HL.forEach(h=>{const C=[-.93,sy+(h-sy)*.812],L=[-.5,h*.8],yIr=Math.abs(C[1]+(L[1]-C[1])*.767),
+   fp=poly([[-3,sy,0],[C[0],C[1],0],[L[0],L[1],0],[Ix,Iy,0]]),cp=poly([[-3,sy,0],[C[0],C[1],0],[-.6,C[1]+(L[1]-C[1])*.767,0]]),
+   mat=g=>dc(new T.TubeGeometry(g,30,.007,5),col,0,0,0,{op:.7}),dots=[];
+   for(let k=0;k<5;k++)dots.push(dc(new T.SphereGeometry(.022,8,6),col,0,0,0,{op:1}));
+   rays.push({yIr,fp,cp,full:mat(fp),cut:mat(cp),dots})})});
+ const gl=img.map(a=>dc(new T.SphereGeometry(.05,12,10),a[2],a[0],a[1],0,{op:.95}));tb([[img[0][0],img[0][1],0],[img[1][0],img[1][1],0]],.012,0xfff3a0,PO,.9);
+ let pr=EYX.br?.09:.33;
+ fx.push(s=>{const tp=EYX.br?.09:.33;pr+=(tp-pr)*.08;const len=.58-pr;iu.scale.y=len;iu.position.y=pr+len/2;idn.scale.y=len;idn.position.y=-(pr+len/2);
+  rays.forEach(r=>{const ok=r.yIr<pr;r.full.visible=ok;r.cut.visible=!ok;const q=ok?r.fp:r.cp;r.dots.forEach((d,i)=>d.position.copy(q.getPointAt((s*.35+i/5)%1)))});
+  gl.forEach((g,i)=>g.scale.setScalar(1+.35*Math.sin(s*5+i)));
+  txt(EYX.br?'Bright light: pupil ~2 mm, thin beam, sharper image, less light':'Dim light: pupil up to 8 mm, wide beam, more light, blurrier edges')});
+ lb([['Cornea',[-1.12,.5,0]],['Pupil',[-.72,.18,0]],['Lens',[-.35,-.4,0]],['Retina',[.78,.66,0]],['Fovea',[1.02,.14,0]],['Optic disc',[.95,-.55,0]],['Object',[-3,.66,0]],['Inverted image',[1.25,.3,0]]]);
+ return {t:'Eye: light ON, cross-section',s:'Roshni cornea + lens se bend hoke retina par ulti image banati hai | Bright/Dim = pupil',rd:5.2,rm:7.8,cam:[0,.1],tg:c.por?[0,.55,0]:[-.55,0,0],ex}}];
+}
+/* ---- v7 EYE: anterior segment nodes (cornea > stroma, iris > plr, lens > aqueous) ---- */
+{
+/* ---------- CORNEA: 5 layers ---------- */
+EYX.N.cornea=['Cornea',c=>{
+ const {ad,tb,sp,bx,cy,lb}=c,
+  P1=part('Tear film','Lipid + aqueous + mucin layer (~7 um): smooth optical surface, oxygen supply, lubrication. Dry eye = unstable film.',1),
+  P2=part('Epithelium','5-6 cell layers (surface squamous, wing, basal columnar). Very rich in free nerve endings (CN V1); regenerates in ~7 days, so abrasions heal fast.',1),
+  P3=part('Bowman layer','Acellular condensed collagen (~12 um). Does NOT regenerate: scars here leave permanent haze.',1),
+  P4=part('Stroma (lamellae)','~90% of thickness (~500 um): 200+ stacked collagen lamellae kept at regular spacing by proteoglycans = transparency. Tap to see why it is clear.',1,'E:stroma'),
+  P5=part('Descemet membrane','Thick basement membrane of the endothelium (thickens with age). Breaks here cause acute hydrops.',1),
+  P6=part('Endothelium','Single layer of hexagonal cells with Na+/K+ pumps: keeps the stroma dehydrated (clear). Cells do NOT regenerate: Fuchs dystrophy / transplant (DMEK).',1),
+  P7=part('Corneal nerves','Ophthalmic division of trigeminal (CN V1): stromal trunks > sub-basal plexus > epithelium. Source of the blink + tearing reflex.',1);
+ bx(0,2.04,0,3,.08,1.2,0x9ad7ff,P1,.4);
+ for(let i=0;i<6;i++){const x=-1.25+i*.5;bx(x,1.88,0,.46,.08,.4,0xd8f0ff,P2,.8);sp(x,1.7,0,.2,.1,.18,0xbfe3f5,P2,.85);bx(x,1.54,0,.3,.2,.3,0x9fd0ea,P2,.85)}
+ bx(0,1.4,0,3,.1,1.2,0xf3eac2,P3,.9);
+ for(let k=0;k<12;k++){const y=1.28-k*.1,odd=k%2;bx(0,y,0,3,.07,1.2,odd?0xe8dcb0:0xd9cc98,P4,.55);for(let j=0;j<5;j++){if(odd)cy(-1.2+j*.6,y,0,.014,1.2,0x8a7a4a,P4,.9,[1.5708,0,0]);else cy(0,y,-.45+j*.22,.014,3,0x8a7a4a,P4,.9,[0,0,1.5708])}}
+ [-.8,.2,1.1].forEach(x=>sp(x,.72,0,.14,.03,.1,0xffffff,P4,.9));
+ bx(0,.05,0,3,.1,1.2,0xf2e6a0,P5,.95);
+ for(let i=0;i<7;i++)cy(-1.35+i*.45,-.1,0,.19,.16,0xd9a0a0,P6,.92);
+ bx(0,-.35,0,3,.34,1.2,0xbfe8ff,P1,.18);
+ tb([[1.7,.8,.1],[.9,.9,.1],[.2,1.2,.1]],.025,0xf2e08a,P7,.95);tb([[.2,1.2,.1],[.2,1.5,.1],[.2,1.85,.1]],.02,0xf2e08a,P7,.95);tb([[-1.4,1.47,.1],[1.4,1.47,.1]],.015,0xf2e08a,P7,.9);
+ lb([['Tear film',[-1.9,2.05,0]],['Epithelium',[-1.9,1.7,0]],['Bowman',[-1.9,1.4,0]],['Stroma',[-1.9,.8,0]],['Descemet',[-1.9,.05,0]],['Endothelium',[-1.9,-.12,.3]],['Aqueous',[-1.9,-.45,0]]]);
+ return {t:'Cornea: 5 layers',s:'Epithelium > Bowman > Stroma > Descemet > Endothelium | Stroma par tap = transparency',rd:5.6,rm:9,cam:[.35,.2],tg:[0,.9,0]}}];
+
+/* ---------- STROMA: collagen lattice, why it is transparent ---------- */
+EYX.N.stroma=['Stroma',c=>{
+ const {cy,sp,dc}=c,ed=()=>EYX.ed,
+  P1=part('Collagen fibrils (~30 nm)','Type I/V collagen fibrils of uniform diameter, packed in a near-crystalline lattice (~60 nm apart): scattered waves cancel each other, only forward light survives.',1),
+  P2=part('Proteoglycans (keratan sulfate)','Hold the fibrils at a fixed spacing and bind water. Lose the spacing and light scatters.',1),
+  P3=part('Keratocytes','Flat stromal cells packed with transparent crystallin proteins; they also repair the matrix.',1),
+  P4=part('Light + scatter','Normal: regular lattice (spacing < half the wavelength) gives destructive interference of scattered light = clear. Oedema (endothelial pump failure): lakes of fluid, irregular spacing = scatter = cloudy cornea, halos around lights.',1);
+ EYX.ed=false;EYX.btn.eyed=b=>{EYX.ed=!EYX.ed;b.textContent=EYX.ed?'Oedema: ON':'Oedema: OFF';b.classList.toggle('on',EYX.ed)};
+ const F=[],rn=RN(5);for(let i=0;i<9;i++)for(let j=0;j<7;j++){const x=-1.6+i*.4+(j%2)*.2,y=-1.2+j*.4,m=cy(x,y,0,.07,1,0xc9b36a,P1,.95,[1.5708,0,0]);F.push({m,x,y,jx:(rn()-.5)*.28,jy:(rn()-.5)*.28})}
+ [[-.9,.0],[.9,-.2]].forEach(a=>sp(a[0],a[1],0,.1,.1,.1,0xcfe0ff,P3,.8));
+ for(let k=0;k<4;k++)sp(-1.3+k*.85,-1.45,0,.28,.07,.1,0x8fb8d0,P2,.7);
+ const D=[];for(let k=0;k<26;k++)D.push({m:dc(new T.SphereGeometry(.035,8,6),0xffe36a,0,0,0,{op:1}),x:-2.2-rn()*3,y:-1.3+rn()*2.6,vy:0,sp:.9+rn()*.4});
+ let u=0,t0=0;fx.push(s=>{const dt=Math.min(.1,s-t0);t0=s;u+=((ed()?1:0)-u)*.06;
+  F.forEach(f=>f.m.position.set(f.x*(1+.12*u)+f.jx*u,f.y*(1+.12*u)+f.jy*u,0));
+  D.forEach(d=>{d.x+=dt*d.sp;if(d.x>2.3){d.x=-2.4;d.y=-1.3+Math.random()*2.6;d.vy=0}if(u>.5&&Math.abs(d.x%.8)<.04)d.vy+=(Math.random()-.5)*.6;d.y+=d.vy*dt;d.m.position.set(d.x,d.y,.15)});
+  c.txt(ed()?'Oedema: lattice disordered, light scatters in all directions = cloudy cornea':'Regular lattice: scattered waves cancel, light passes straight = transparent')});
+ c.lb([['Collagen fibril (end-on)',[-1.5,1.65,0]],['Keratocyte',[-.9,.35,0]],['Proteoglycan',[-1.3,-1.7,0]],['Light',[-2.1,1.1,0]]]);
+ return {t:'Stroma: why the cornea is clear',s:'Collagen lattice end-on | Oedema button se scatter dekhein',rd:5.6,rm:9,cam:[0,.05],tg:[0,0,0],ex:'<button id="eyed">Oedema: OFF</button>'}}];
+
+/* ---------- IRIS: muscles + pupil size ---------- */
+EYX.N.iris=['Iris + pupil',c=>{
+ const {ad,tb,lb,txt}=c,
+  PPu=part('Pupil (2-8 mm)','Hole in the iris: 2 mm in bright light (less light, deeper focus) to 8 mm in the dark. Size is set by two opposing muscles.',1),
+  PSp=part('Sphincter pupillae','Circular smooth muscle at the pupil margin. Parasympathetic (CN III > ciliary ganglion > short ciliary nerves, M3 receptors): contracts = MIOSIS.',1,'E:plr'),
+  PDi=part('Dilator pupillae','Radial smooth muscle fibres (myoepithelial). Sympathetic (T1 > superior cervical ganglion > long ciliary nerves, alpha-1): contracts = MYDRIASIS.',1),
+  PSt=part('Iris stroma','Pigmented connective tissue with vessels; melanin amount sets eye colour (blue = little melanin, brown = a lot). Gold ring = collarette.',1),
+  PPe=part('Posterior pigment epithelium','Always dark brown, blocks stray light. Transillumination defects show iris damage.',1),
+  PNp=part('Parasympathetic nerves (CN III)','Edinger-Westphal nucleus > CN III > ciliary ganglion > short ciliary nerves. Tap for the light-reflex pathway.',1,'E:plr'),
+  PNs=part('Sympathetic nerves','Hypothalamus > spinal cord T1 > superior cervical ganglion > long ciliary nerves. Interruption = Horner syndrome (small pupil, ptosis).',1),
+  PLm=part('Limbus + sclera','Junction of cornea and sclera; houses stem cells + the drainage angle.',1);
+ ad(new T.RingGeometry(1,1.5,64),0xf2eee6,0,0,0,{op:.97},PLm);ad(new T.CircleGeometry(1,64),0x1a1210,0,0,-.01,{op:1},PPe);ad(new T.CircleGeometry(1,64),0x4aa3a8,0,0,.02,{op:.97},PSt);
+ const go=ad(new T.RingGeometry(1,1.45,56),0xd9a441,0,0,.03,{op:.97},PSt),pu=ad(new T.CircleGeometry(1,44),0x050507,0,0,.045,{op:1},PPu),sph=ad(new T.TorusGeometry(1,.05,10,56),0xb5483a,0,0,.05,{op:.97},PSp),SP=[];
+ for(let k=0;k<40;k++)SP.push(ad(new T.BoxGeometry(.012,1,.01),0x1f6f78,0,0,.035,{op:.85},PDi));
+ [-.5,0,.5].forEach(a=>tb([[Math.sin(a)*1.45,Math.cos(a)*1.45,.05],[Math.sin(a)*1.1,Math.cos(a)*1.1,.06],[Math.sin(a)*.75,Math.cos(a)*.75,.06]],.025,0xf2e08a,PNp,.95));
+ [2.2,3.4,4.3].forEach(a=>tb([[Math.sin(a)*1.45,Math.cos(a)*1.45,.05],[Math.sin(a)*1.05,Math.cos(a)*1.05,.06],[Math.sin(a)*.95,Math.cos(a)*.95,.06]],.022,0x7fb2ff,PNs,.95));
+ let pr=EYX.br?.167:.667;
+ fx.push(s=>{const tp=EYX.br?.167:.667;pr+=(tp-pr)*.07;go.scale.set(pr,pr,1);pu.scale.set(pr,pr,1);sph.scale.set(pr*1.1,pr*1.1,1);
+  SP.forEach((m,k)=>{const a=k/40*6.2832,r0=pr*1.2,L=.97-r0,r=r0+L/2;m.position.set(Math.cos(a)*r,Math.sin(a)*r,.035);m.scale.y=L;m.rotation.z=a-1.5708});
+  txt(EYX.br?'Bright light: sphincter contracts (CN III) > pupil ~2 mm (miosis)':'Dark: dilator contracts (sympathetic) > pupil up to 8 mm (mydriasis)')});
+ EYX.btn.eybr=b=>{EYX.br=!EYX.br;b.textContent=EYX.br?'Bright':'Dark'};
+ lb([['Pupil',[0,0,.2]],['Sphincter',[.0,.95,.1]],['Dilator (radial)',[-1.0,-.4,.1]],['Collarette',[.95,-.3,.1]],['Sclera',[1.25,-.95,0]],['Parasympathetic',[-.55,1.45,0]],['Sympathetic',[.9,-1.2,0]]]);
+ return {t:'Iris + pupil muscles',s:'Bright/Dark button: sphincter vs dilator | part par tap karein',rd:3.4,rm:5.4,cam:[0,.08],tg:[0,0,0],ex:'<button id="eybr" class="on">'+(EYX.br?'Bright':'Dark')+'</button>'}}];
+
+/* ---------- PLR: pupillary light reflex pathway ---------- */
+EYX.N.plr=['Light reflex',c=>{
+ const {ad,tb,sp,dc,poly,lb,txt}=c,
+  PA=part('Afferent limb: retina > CN II','Ganglion cells (melanopsin RGCs + others) > optic nerve > chiasma > optic tract > pretectal nucleus (NOT the lateral geniculate).',1),
+  PP=part('Pretectal nucleus','Midbrain relay: sends signals to BOTH Edinger-Westphal nuclei (via the posterior commissure), so both pupils react.',1),
+  PE=part('Edinger-Westphal nucleus','Parasympathetic nucleus of CN III in the midbrain.',1),
+  PF=part('Efferent limb: CN III > ciliary ganglion','Preganglionic fibres > ciliary ganglion (in the orbit) > short ciliary nerves > sphincter pupillae. Compressed CN III (uncal herniation, aneurysm) = fixed dilated pupil.',1),
+  PD=part('Direct vs consensual reflex','Light in ONE eye constricts BOTH pupils: direct = same eye, consensual = other eye.',1),
+  PR=part('Swinging-flashlight test (RAPD)','Alternate the light between eyes: an eye with optic-nerve damage dilates when lit (relative afferent pupillary defect).',1);
+ EYX.side=1;EYX.btn.eysd=b=>{EYX.side=-EYX.side;b.textContent='Light on: '+(EYX.side>0?'right':'left')+' eye'};
+ const eyes=[-1,1].map(s=>({s,sp:sp(s*1.3,-1.9,0,.55,.55,.2,0xf2eee6,PA,.95),pu:null}));
+ eyes.forEach(e=>{e.pu=ad(new T.CircleGeometry(1,24),0x0a0a0c,e.s*1.3,-2.12,.22,{op:1,s:[.2,.2,1]},PA)});
+ [-1,1].forEach(s=>{tb([[s*1.15,-1.4,0],[s*.7,-1.0,0],[0,-.6,0]],.07,0x8fc8ff,PA,.95);tb([[0,-.6,0],[s*.4,-.1,0],[s*.45,.7,0]],.07,0x8fc8ff,PA,.95);
+  sp(s*.45,.7,0,.2,.2,.2,0x7cc4ff,PP,.95);tb([[s*.45,.7,0],[s*.3,1.1,0],[s*.2,1.5,0]],.03,0xf2e08a,PP,.9);tb([[s*.45,.7,0],[0,1.15,0],[-s*.2,1.5,0]],.03,0xf2e08a,PP,.9);
+  sp(s*.2,1.5,0,.17,.17,.17,0xffd15a,PE,.95);tb([[s*.2,1.5,0],[s*1.4,.9,0],[s*1.75,-.3,0],[s*1.6,-1.0,0]],.04,0xf2e08a,PF,.95);sp(s*1.6,-1.0,0,.1,.1,.1,0xffd15a,PF,.95);tb([[s*1.6,-1.0,0],[s*1.45,-1.55,0]],.03,0xf2e08a,PF,.95)});
+ tb([[-.45,.7,0],[0,.85,0],[.45,.7,0]],.03,0x7cc4ff,PP,.9);
+ const mk2=(pts,col)=>({cp:poly(pts),d:[0,1,2,3,4].map(()=>dc(new T.SphereGeometry(.04,8,6),col,0,0,0,{op:1}))}),
+  aff=[1,-1].map(s=>mk2([[s*1.15,-1.4,0],[s*.7,-1.0,0],[0,-.6,0],[s*.4,-.1,0],[s*.45,.7,0]].map(a=>[a[0],a[1],.08]),0x8fe0ff)),
+  eff=[1,-1].map(s=>mk2([[s*.45,.7,.08],[s*.3,1.1,.08],[s*.2,1.5,.08],[s*1.4,.9,.08],[s*1.75,-.3,.08],[s*1.6,-1.0,.08],[s*1.45,-1.55,.08]],0xffe36a));
+ let p=.9;fx.push(s=>{const k=EYX.side>0?0:1;aff.forEach((a,i)=>a.d.forEach((d,j)=>{d.visible=i==k;d.position.copy(a.cp.getPointAt((s*.25+j/5)%1))}));
+  eff.forEach(a=>a.d.forEach((d,j)=>d.position.copy(a.cp.getPointAt((s*.25+j/5)%1))));p+=(.2-p)*.04;eyes.forEach(e=>e.pu.scale.set(.2,.2,1));
+  txt('Light in '+(EYX.side>0?'right':'left')+' eye > afferent CN II > both pretectal nuclei > both E-W nuclei > CN III > BOTH pupils constrict')});
+ lb([['Retina / CN II',[-2.0,-1.0,0]],['Optic chiasma',[0,-.9,0]],['Pretectal nucleus',[-1.05,.45,0]],['Edinger-Westphal',[0,1.85,0]],['CN III',[2.15,.5,0]],['Ciliary ganglion',[2.1,-1.05,0]],['Pupil (both)',[0,-2.5,0]]]);
+ return {t:'Pupillary light reflex',s:'Ek aankh me roshni > dono pupils sikudte hain (direct + consensual)',rd:7,rm:11,cam:[0,.05],tg:[0,-.2,0],ex:'<button id="eysd" class="on">Light on: right eye</button>'}}];
+
+/* ---------- LENS: accommodation ---------- */
+EYX.N.lens=['Lens',c=>{
+ const {ad,tb,sp,bx,cy,dc,lb,txt}=c,
+  PCp=part('Lens capsule','Elastic basement-membrane bag (type IV collagen); the zonules pull on it. Cataract surgery keeps the capsule to hold the new lens.',1),
+  PCo=part('Cortex','Newer, softer, transparent lens fibres; added throughout life.',1),
+  PNu=part('Nucleus','Oldest, densest fibres (embryonic core); yellows and hardens with age = nuclear cataract + presbyopia.',1),
+  PEp=part('Anterior epithelium + fibres','Cuboidal cells under the anterior capsule elongate at the equator into fibres which lose their nuclei = transparent. No blood vessels; fed by aqueous.',1),
+  PZ=part('Zonular fibres (suspensory ligament)','Fibrillin strands from the ciliary processes to the lens equator. Taut when the ciliary muscle is relaxed.',1),
+  PCm=part('Ciliary muscle','Smooth muscle ring (parasympathetic CN III, M3). Contracts = ring narrows = zonules slacken. Tap for aqueous production + drainage.',1,'E:aqueous');
+ EYX.near=false;EYX.btn.eyne=b=>{EYX.near=!EYX.near;b.textContent=EYX.near?'Near vision':'Far vision'};
+ const cap=sp(0,0,0,.32,.93,.5,0xe8d890,PCp,.35),cor=sp(0,0,0,.27,.84,.45,0xf5e8b0,PCo,.6),nuc=sp(0,0,0,.15,.5,.3,0xe6c75a,PNu,.85);
+ const ep=[];for(let k=-5;k<=5;k++)ep.push(sp(-.3,k*.12,0,.03,.03,.03,0xffffff,PEp,.95));
+ const zs=[],cb=[];[1,-1].forEach(s=>{cb.push(sp(-.1,s*1.95,0,.3,.28,.4,0x9a6a4a,PCm,.95));[-.12,0,.12].forEach(o=>zs.push({s,o,m:cy(0,0,0,.012,1,0xe8e0c8,PZ,.9)}))});
+ tb([[-.35,.3,0],[-.5,0,0],[-.35,-.3,0]],.01,0xffffff,PEp,.5);
+ let u=0;fx.push(s=>{u+=((EYX.near?1:0)-u)*.06;const ax=.3+.15*u,ay=.93-.1*u;cap.scale.set(ax+.02,ay,.5);cor.scale.set(ax-.03,ay-.09,.45);nuc.scale.set(.15+.06*u,.5,.3);
+  ep.forEach((m,i)=>{const y=(i-5)*.12*(ay/.93),x=-(ax+.02)*Math.sqrt(Math.max(0,1-(y/ay)*(y/ay)));m.position.set(x,y,0)});
+  cb.forEach((m,i)=>{const sg=i?-1:1;m.position.set(-.1-.15*u,sg*(1.95-.5*u),0)});
+  zs.forEach(z=>{const a=[0,z.s*ay*.97+z.o*.3,0],b=[-.1-.15*u+z.o*.5,z.s*(1.95-.5*u)-z.s*.1,0],L=Math.hypot(b[0]-a[0],b[1]-a[1]);z.m.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,0);z.m.scale.set(1,L,1);z.m.rotation.z=Math.atan2(b[0]-a[0],a[1]-b[1])+(b[1]<a[1]?0:0);z.m.material.opacity=.95-.5*u});
+  txt(EYX.near?'Near: ciliary muscle contracts (CN III), zonules slack, lens ROUNDS (up to ~30 D in youth)':'Far: ciliary muscle relaxed, zonules TAUT, lens flat (~15 D). Presbyopia = lens too stiff to round')});
+ lb([['Capsule',[.55,.75,0]],['Cortex',[.5,.2,0]],['Nucleus',[.35,-.25,0]],['Epithelium',[-.8,.4,0]],['Zonules',[-.75,1.5,0]],['Ciliary muscle',[-.6,2.3,0]]]);
+ return {t:'Lens + accommodation',s:'Near/Far button: ciliary muscle + zonules + lens shape',rd:6,rm:10,cam:[.3,.12],tg:[0,0,0],ex:'<button id="eyne">Far vision</button>'}}];
+
+/* ---------- AQUEOUS: production, drainage, glaucoma ---------- */
+EYX.N.aqueous=['Aqueous flow',c=>{
+ const {ad,tb,sp,bx,dc,poly,lb,txt}=c,
+  P1=part('Ciliary processes (production)','Epithelium of the ciliary processes secretes aqueous humour (~2.5 uL/min) from plasma: carbonic anhydrase + Na+/K+ ATPase. Drugs (timolol, dorzolamide) lower this.',1),
+  P2=part('Posterior chamber','Narrow space between the iris and lens, filled with fresh aqueous.',1),
+  P3=part('Pupil (flow bottleneck)','Aqueous squeezes between pupil margin and lens. Pupil block pushes the iris forward = acute angle-closure glaucoma (eye emergency).',1),
+  P4=part('Anterior chamber','Between cornea and iris; aqueous nourishes the avascular cornea + lens.',1),
+  P5=part('Trabecular meshwork','Sieve at the iridocorneal angle: ~90% of outflow (conventional route), pressure-dependent. Clogging = primary open-angle glaucoma.',1),
+  P6=part('Canal of Schlemm','Ring canal collecting aqueous > collector channels > episcleral veins.',1),
+  P7=part('IOP gauge (10-21 mmHg)','Intraocular pressure balances production against outflow. Raised IOP damages optic-nerve axons (cupping) = glaucoma, the leading cause of irreversible blindness.',1);
+ EYX.blk=false;EYX.btn.eybk=b=>{EYX.blk=!EYX.blk;b.textContent=EYX.blk?'Outflow: BLOCKED':'Outflow: normal';b.classList.toggle('on',EYX.blk)};
+ tb([[-1.55,0,0],[-1.45,1.0,0],[-1.0,1.7,0]],.05,0xbfe6ff,P4,.7);tb([[-1.0,1.7,0],[-.4,2.05,0]],.07,0xf2eee6,P4,.95);
+ sp(-1.05,.8,0,.5,.95,.5,0xbfe8ff,P4,.2);sp(-.3,0,0,.3,.95,.45,0xf5e8b0,P2,.7);
+ tb([[-.7,1.4,0],[-.75,.8,0],[-.76,.38,0]],.05,0x4aa3a8,P3,.95);sp(-.45,1.55,0,.22,.2,.25,0x9a6a4a,P1,.95);
+ bx(-.88,1.6,0,.1,.22,.2,0xd9a441,P5,.95);sp(-.78,1.78,0,.1,.07,.1,0x2f6fe0,P6,.95);tb([[-.78,1.8,0],[-.55,2.15,0],[-.2,2.5,0]],.04,0x2f6fe0,P6,.95);
+ const path=[[-.45,1.45,.05],[-.55,1.05,.05],[-.68,.55,.05],[-.75,.34,.05],[-.95,.6,.05],[-1.02,1.1,.05],[-.92,1.5,.05],[-.86,1.62,.05],[-.78,1.78,.05],[-.55,2.15,.05]],cp=poly(path),D=[];
+ for(let k=0;k<16;k++)D.push({m:dc(new T.SphereGeometry(.035,8,6),0x9fe0ff,0,0,0,{op:1}),u:k/16});
+ const gauge=bx(1.5,.0,0,.28,1,.2,0x4fb060,P7,.95),base=bx(1.5,-.0,0,.4,.05,.3,0x888888,P7,.9);
+ let p=0,t0=0;fx.push(s=>{const dt=Math.min(.1,s-t0);t0=s;p+=((EYX.blk?1:0)-p)*.03;
+  D.forEach(d=>{const slow=d.u>.6?1-.95*p:1;d.u=(d.u+dt*.12*slow)%1;if(EYX.blk&&d.u>.58&&d.u<.62)d.u=.58;d.m.position.copy(cp.getPointAt(Math.min(.999,d.u)))});
+  const iop=15+25*p,h=.4+iop/40*1.8;gauge.scale.y=h;gauge.position.y=-.2+h/2;gauge.material.color.setHex(p>.5?0xe0402f:0x4fb060);
+  txt(EYX.blk?'Outflow BLOCKED: IOP up to ~40 mmHg > optic-nerve cupping > peripheral field loss (glaucoma)':'Normal outflow: production = drainage, IOP ~15 mmHg')});
+ lb([['Ciliary processes',[-.2,1.15,0]],['Posterior chamber',[.45,.7,0]],['Pupil',[-.5,.0,0]],['Anterior chamber',[-1.9,.5,0]],['Trabecular meshwork',[-1.95,1.7,0]],['Schlemm canal',[-.2,1.95,0]],['IOP',[1.5,-.5,0]]]);
+ return {t:'Aqueous humour: flow + glaucoma',s:'Ciliary body > pupil > angle > trabecular meshwork > Schlemm > veins',rd:6,rm:10,cam:[0,.05],tg:[0,1.0,0],ex:'<button id="eybk">Outflow: normal</button>'}}];
+}
+/* ---- v7 EYE: retina branch (retina > rod > cascade, retina > on/off, fundus > visual pathway) ---- */
+{
+const k01=x=>Math.max(0,Math.min(1,x));
+/* ---------- RETINA: layers (light enters from the TOP, goes through everything) ---------- */
+EYX.N.retina=['Retina',c=>{
+ const {ad,tb,sp,bx,cy,dc,lb,txt}=c,
+  PV=part('Vitreous + ILM','Vitreous gel sits on the inner limiting membrane (Muller-cell end-feet). Light enters the retina from here.',1),
+  PN=part('RNFL (nerve fibre layer)','Unmyelinated ganglion-cell axons run along the surface to the optic disc, then myelinate behind the lamina cribrosa.',1,'E:fundus'),
+  PG=part('GCL: ganglion cells','Output neurons (~1.2 million): fire action potentials. ON and OFF types. Tap for the ON/OFF circuit.',1,'E:onoff'),
+  PI=part('IPL (inner plexiform)','Synapses of bipolar, amacrine and ganglion cells. Sublamina b = ON (inner), sublamina a = OFF (outer).',1),
+  PB=part('INL: bipolar, horizontal, amacrine, Muller','Bipolar cells relay photoreceptor > ganglion; horizontal cells give lateral inhibition (centre-surround); amacrine cells modulate; Muller glia span the whole retina. Tap for ON/OFF processing.',1,'E:onoff'),
+  PO=part('OPL (outer plexiform)','Photoreceptor terminals synapse onto bipolar + horizontal cells (glutamate).',1),
+  PNL=part('ONL: photoreceptor nuclei','Cell bodies of rods and cones.',1),
+  PRd=part('Rods','~120 million: dim light, black-white, very sensitive (single photon), absent from the fovea. Tap for the rod cell.',1,'E:photo'),
+  PCn=part('Cones','~6 million (L, M, S): colour + fine detail, dense in the fovea. Tap for the photoreceptor.',1,'E:photo'),
+  PRp=part('RPE + Bruch + choroid','Retinal pigment epithelium: absorbs light, recycles retinoid (visual cycle), phagocytoses shed disc tips daily, forms the outer blood-retina barrier. Detachment separates retina from the RPE.',1),
+  PM=part('Muller glia','Radial glial cells: K+ buffering, structural support from ILM to ELM.',1);
+ const L=[['VITREOUS',3.2,.5,0x9fd0ff,PV],['RNFL',2.82,.14,0x6fa8e8,PN],['GCL',2.55,.3,0x4a78c8,PG],['IPL',2.0,.7,0x2f4f98,PI],['INL',1.3,.5,0x2a4a8a,PB],['OPL',.85,.14,0x3a5aa8,PO],['ONL',.45,.6,0x243a78,PNL],['ELM',.1,.05,0x8fb8ff,PNL],['IS',-.15,.4,0x2a5a98,PRd],['OS',-.7,.7,0x1f4a88,PRd],['RPE',-1.2,.2,0x8a5a3a,PRp],['CHOROID',-1.55,.4,0x7a2a2a,PRp]];
+ L.forEach(a=>bx(0,a[1],-.15,2.7,a[2],.05,a[3],a[4],.35));
+ const RX=[-1.2,-.96,-.48,-.24,.24,.48,.96,1.2],CX=[-.72,0,.72];
+ RX.forEach(x=>{cy(x,-.15,0,.045,.4,0x6fc4ff,PRd,.9);cy(x,-.7,0,.045,.7,0x4aa8f0,PRd,.9);sp(x,.45,0,.06,.1,.06,0x2b3f7a,PRd,.95);cy(x,.68,0,.008,.4,0x6fa8e8,PRd,.8);sp(x,.88,0,.05,.04,.05,0x6fc4ff,PRd,.95)});
+ CX.forEach(x=>{sp(x,-.1,0,.09,.2,.09,0xa78bfa,PCn,.95);ad(new T.CylinderGeometry(.01,.075,.7,16),0x8f6df0,x,-.7,0,{op:.95},PCn);sp(x,.5,0,.09,.13,.09,0x4a3a98,PCn,.95);sp(x,.88,0,.1,.04,.1,0xa78bfa,PCn,.95)});
+ [-1.0,-.3,.4,1.0].forEach(x=>{sp(x,1.3,0,.09,.14,.09,0x7fb2ff,PB,.95);tb([[x,1.2,0],[x+(x<0?.1:-.1),.98,0]],.012,0x7fb2ff,PB,.8);tb([[x,1.42,0],[x,2.1,0]],.012,0x7fb2ff,PB,.8)});
+ [-.7,.7].forEach(x=>sp(x,.98,0,.2,.04,.07,0x40c8c0,PB,.95));[-.4,.9].forEach(x=>sp(x,1.62,0,.06,.06,.06,0xc890ff,PB,.95));
+ [-1.2,-.6,0,.6,1.2].forEach(x=>{sp(x,2.55,0,.13,.13,.1,0x8aa0d0,PG,.95);tb([[x,2.62,0],[x,2.82,0],[1.35,2.82,0]],.012,0x8aa0d0,PN,.8);tb([[x,2.45,0],[x,2.1,0]],.01,0x8aa0d0,PG,.7)});
+ tb([[-1.1,2.95,0],[-1.1,.1,0]],.02,0xff9fbf,PM,.6);
+ for(let i=0;i<8;i++){bx(-1.15+i*.33,-1.2,0,.31,.2,.4,0x8a5a3a,PRp,.92);sp(-1.15+i*.33,-1.12,.2,.025,.025,.025,0x2b1a10,PRp,1)}
+ bx(0,-1.2,0,2.7,.02,.3,0xd0c0a0,PRp,.9);
+ const D=[];for(let k=0;k<14;k++)D.push(dc(new T.SphereGeometry(.04,8,6),0xffe36a,-1.2+(k%7)*.4,0,0,{op:1}));
+ fx.push(s=>{D.forEach((d,k)=>{const u=((s*.25+k/14)%1);d.position.y=3.5-u*4.3;d.position.x=-1.2+(k%7)*.4+Math.sin(s*2+k)*.04});txt('Light neeche se nahi, UPAR se aata hai: sab layers cross karke rods/cones tak (inverted retina)')});
+ lb(L.filter((a,i)=>i!=7).map(a=>[a[0],[-1.55,a[1],.05]]));
+ return {t:'Retina: 10 layers',s:'Rod/Cone > Bipolar > Ganglion | part par tap karein',rd:6.5,rm:10.5,cam:[0,.03],tg:[0,.9,0]}}];
+
+/* ---------- PHOTO: rod cell, dark vs light ---------- */
+EYX.N.photo=['Rod cell',c=>{
+ const {ad,tb,sp,cy,dc,lb,txt}=c,
+  P1=part('Synaptic spherule','Releases glutamate continuously in the dark (tonic); less in light. Synapses onto ON/OFF bipolar + horizontal cells.',1,'E:onoff'),
+  P2=part('Nucleus (ONL)','Cell body region of the rod.',1),
+  P3=part('Inner segment','Mitochondria (ATP), ER, Na+/K+ ATPase: pumps Na+ out and K+ in; K+ leaves through leak channels.',1),
+  P4=part('Connecting cilium','Modified 9+0 cilium: only route for proteins from inner to outer segment.',1),
+  P5=part('Outer segment: stacked discs','~1000 discs, each packed with RHODOPSIN (~10^8 molecules). New discs form at the base; tips are shed and eaten by the RPE (renewed ~10 days). Tap for the molecular cascade.',1,'E:cascade'),
+  P6=part('Dark current','In the dark cGMP keeps CNG channels open: Na+ + Ca2+ enter the outer segment, K+ leaves the inner segment. Vm ~ -40 mV (partly depolarised).',1,'E:cascade'),
+  P7=part('Voltage gauge','Light HYPERPOLARISES the rod to ~ -65 mV (graded, no spikes), which REDUCES glutamate release. Photoreceptors are the only sensory cells that hyperpolarise to their stimulus.',1);
+ EYX.pl=false;EYX.btn.eypl=b=>{EYX.pl=!EYX.pl;b.textContent=EYX.pl?'Light: ON':'Dark state';b.classList.toggle('on',EYX.pl)};
+ sp(0,3.1,0,.28,.22,.28,0x6fc4ff,P1,.95);tb([[0,2.9,0],[0,2.4,0]],.025,0x6fc4ff,P1,.9);sp(0,2.0,0,.3,.4,.3,0x2b3f7a,P2,.95);tb([[0,1.6,0],[0,1.4,0]],.03,0x6fc4ff,P2,.9);
+ sp(0,.8,0,.36,.62,.36,0x4a9fe8,P3,.9);for(let k=0;k<6;k++)sp(Math.sin(k*1.1)*.16,.4+k*.18,Math.cos(k*1.1)*.16,.05,.03,.03,0xffb86a,P3,.95);
+ tb([[0,.2,0],[0,-.05,0]],.035,0xdfefff,P4,.95);cy(0,-1.15,0,.33,2.2,0x3d7fd8,P5,.35);
+ for(let k=0;k<13;k++)cy(0,-.25-k*.16,0,.3,.05,0x6fc4ff,P5,.95);
+ const gauge=ad(new T.BoxGeometry(.3,1,.2),0xffb060,1.5,0,0,{op:.95},P7);
+ const Na=[],K=[],G=[];for(let k=0;k<14;k++)Na.push({m:dc(new T.SphereGeometry(.045,8,6),0xffd24a,0,0,0,{op:1}),u:k/14,y:-.4-(k%7)*.28,s:k%2?1:-1});
+ for(let k=0;k<8;k++)K.push({m:dc(new T.SphereGeometry(.045,8,6),0xc890ff,0,0,0,{op:1}),u:k/8,s:k%2?1:-1});
+ for(let k=0;k<10;k++)G.push({m:dc(new T.SphereGeometry(.035,8,6),0x9fffd0,0,0,0,{op:1}),u:k/10,s:k%2?1:-1});
+ const ph=dc(new T.SphereGeometry(.09,12,10),0xffffff,0,0,0,{op:1});let v=0,t0=0;
+ fx.push(s=>{const dt=Math.min(.1,s-t0);t0=s;v+=((EYX.pl?1:0)-v)*.05;const dark=1-v;
+  Na.forEach(a=>{a.u=(a.u+dt*.35)%1;a.m.visible=dark>.35;a.m.position.set(a.s*(1.1-.75*a.u),a.y,0)});
+  K.forEach(a=>{a.u=(a.u+dt*.3)%1;a.m.position.set(a.s*(.4+.9*a.u),.8,0)});
+  G.forEach(a=>{a.u=(a.u+dt*(.15+.35*dark))%1;a.m.visible=a.u<dark+.15;a.m.position.set(a.s*(.3+.7*a.u),3.1-.5*a.u,0)});
+  ph.visible=v>.5;ph.position.set(0,3.6-((s*1.2)%1)*4.5,0);
+  const h=.5+.95*v;gauge.scale.y=h;gauge.position.y=-.3+h/2;gauge.material.color.setHex(v>.5?0x4a9fe8:0xffb060);
+  txt(EYX.pl?'LIGHT: rhodopsin > transducin > PDE6, cGMP falls, channels close, Vm -65 mV, glutamate DOWN':'DARK: cGMP high, CNG open, Na+/Ca2+ IN (dark current), Vm -40 mV, glutamate released continuously')});
+ lb([['Synaptic spherule',[1.0,3.1,0]],['Nucleus',[.9,2.0,0]],['Inner segment',[.95,.8,0]],['Connecting cilium',[1.2,.1,0]],['Outer segment',[-1.05,-1.2,0]],['Dark current',[-1.15,-.5,0]],['Vm',[1.5,-1.0,0]]]);
+ return {t:'Rod photoreceptor',s:'Dark / Light button: dark current + glutamate | part par tap karein',rd:8.5,rm:13,cam:[0,.03],tg:[.2,.55,0],ex:'<button id="eypl">Dark state</button>'}}];
+
+/* ---------- CASCADE: rhodopsin > transducin > PDE6 ---------- */
+EYX.N.cascade=['Phototransduction',c=>{
+ const {ad,tb,sp,bx,cy,dc,lb,txt}=c,
+  P1=part('Disc membrane (bilayer)','Stacked membrane discs: the huge surface area holds ~10^8 rhodopsin molecules, so a single photon can be detected.',1),
+  P2=part('Rhodopsin (opsin + 11-cis retinal)','7-transmembrane GPCR. A photon isomerises 11-cis to all-trans retinal = R* (metarhodopsin II). Rhodopsin kinase + arrestin switch it off.',1),
+  P3=part('Transducin (Gt)','G protein: R* swaps GDP for GTP on Galpha-t; each R* activates ~100s of transducins = AMPLIFICATION.',1),
+  P4=part('PDE6 (phosphodiesterase)','Activated when Galpha-t-GTP removes its inhibitory gamma subunit. Hydrolyses cGMP to 5\u2032-GMP extremely fast.',1),
+  P5=part('cGMP','Second messenger kept high in the dark by guanylate cyclase; holds CNG channels OPEN. Light makes it fall.',1),
+  P6=part('CNG channel','Cyclic-nucleotide-gated cation channel in the plasma membrane: open with cGMP (Na+/Ca2+ in); closes when cGMP drops = hyperpolarisation.',1),
+  P7=part('Plasma membrane','Outer segment surface, separate from the discs; carries the CNG channels + Na+/Ca2+ exchanger.',1);
+ EYX.pa=false;EYX.btn.eypa=b=>{EYX.pa=!EYX.pa;b.textContent=EYX.pa?'Paused':'Playing';b.classList.toggle('on',!EYX.pa)};
+ [1.1,-.4].forEach(y=>{bx(-.05,y,0,2.6,.07,.6,0x3d7fd8,P1,.9);bx(-.05,y-.12,0,2.6,.07,.6,0x3d7fd8,P1,.9);bx(-.05,y-.06,0,2.6,.05,.58,0x16306a,P1,.5)});
+ bx(1.45,.3,0,.1,3,.6,0x3d7fd8,P7,.85);
+ const ch=[.9,.2,-.5].map(y=>cy(1.45,y,0,.11,.3,0x6fe0a0,P6,.95,[0,0,1.5708]));
+ const rho=[-.9,-.3,.4].map(x=>{const g=[-.06,0,.06].map(o=>cy(x+o,1.0,0,.03,.22,0x5a8fe0,P2,.95));const r=sp(x,1.0,.0,.04,.04,.04,0xffa040,P2,1);return {g,r,x}});
+ const gt=sp(-.3,.72,0,.1,.1,.1,0x9fd0ff,P3,.95),gta=sp(-.3,.72,.12,.07,.07,.07,0xffb060,P3,1),gb=sp(-.2,.68,-.05,.06,.05,.06,0x7fb2ff,P3,.95);
+ const pd=[.45,.62].map(x=>sp(x,.5,0,.09,.09,.09,0x7a8aa8,P4,.95));
+ const cg=[];const rn=RN(11);for(let k=0;k<16;k++)cg.push({m:sp(-1.1+rn()*2.2,-.3+rn()*1.1,0,.045,.045,.045,0x6fe0a0,P5,.95),x:-1.1+rn()*2.2,y:-.3+rn()*1.1,r:rn(),p:rn()*6});
+ const Na=[];for(let k=0;k<8;k++)Na.push({m:dc(new T.SphereGeometry(.04,8,6),0xffd24a,0,0,0,{op:1}),u:k/8,y:[.9,.2,-.5][k%3]});
+ const ph=dc(new T.SphereGeometry(.1,12,10),0xffffff,-.3,3,0,{op:1});let tt=0,t0=0;
+ const ST=['Dark: cGMP high, CNG channels open, Na+/Ca2+ flow in (-40 mV)','Photon hits rhodopsin: 11-cis to all-trans retinal = R* (metarhodopsin II)','R* activates transducin: GDP to GTP, Galpha-t-GTP is released','Galpha-t-GTP binds PDE6 > PDE6 ACTIVE','PDE6 hydrolyses cGMP to 5\u2032-GMP: cGMP level falls','CNG channels CLOSE: Na+/Ca2+ stop > hyperpolarisation (-65 mV) > less glutamate','Recovery: rhodopsin kinase + arrestin quench R*; guanylate cyclase rebuilds cGMP'];
+ fx.push(s=>{const dt=Math.min(.1,s-t0);t0=s;if(!EYX.pa)tt=(tt+dt)%14;const p=tt;
+  const act=p>3&&p<12.5,gm=act?k01((p-3.6)/1.6):0,pdeOn=p>6.8&&p<12.8,cf=p<7.2?1:p<9.5?1-.85*k01((p-7.2)/2.3):p<12.5?.15:.15+.85*k01((p-12.5)/1.5),open=cf>.45;
+  ph.visible=p>2&&p<3.2;ph.position.set(-.3,3-(p-2)/1.2*1.9,0);
+  rho[1].r.material.color.setHex(act?0xff5a20:0xffa040);rho[1].r.scale.setScalar(act?.065:.04);
+  gt.position.set(-.3+.75*gm*0,.72-.0,0);gta.visible=act;gta.position.set(-.3+(.75*gm),.72-.2*gm,.12);gta.scale.setScalar(.07);
+  pd.forEach(m=>m.material.color.setHex(pdeOn?0xff9a30:0x7a8aa8));
+  cg.forEach(g=>{const x=g.m.userData.on;g.m.position.set(g.x+Math.sin(s*.8+g.p)*.05,g.y+Math.cos(s*.7+g.p)*.05,0);const dead=g.r>cf;g.m.material.color.setHex(dead?0x777777:0x6fe0a0);g.m.material.opacity=dead?.5:.95});
+  ch.forEach(m=>m.material.color.setHex(open?0x6fe0a0:0xd84a4a));
+  Na.forEach(a=>{a.u=(a.u+dt*.5)%1;a.m.visible=open;a.m.position.set(2.0-.7*a.u,a.y,0)});
+  txt(ST[p<2?0:p<3.2?1:p<5.2?2:p<7.2?3:p<9.5?4:p<12.5?5:6])});
+ lb([['Rhodopsin',[-.9,1.45,0]],['Transducin',[-.95,.55,0]],['PDE6',[.55,.15,0]],['cGMP',[-1.0,-.1,0]],['CNG channel',[1.9,.55,0]],['Disc',[-1.4,1.3,0]],['Na+ Ca2+',[2.0,-.2,0]]]);
+ return {t:'Phototransduction cascade',s:'Rhodopsin > Transducin > PDE6 > cGMP down > channels close',rd:6.5,rm:10.5,cam:[0,.03],tg:[.3,.5,0],ex:'<button id="eypa" class="on">Playing</button>'}}];
+
+/* ---------- ON/OFF bipolar processing ---------- */
+EYX.N.onoff=['ON/OFF circuit',c=>{
+ const {ad,tb,sp,bx,dc,poly,lb,txt}=c,
+  P1=part('Cone terminal (glutamate)','Releases glutamate in the DARK; light hyperpolarises the cone, so glutamate release DROPS.',1),
+  P2=part('ON bipolar cell','Receptor: mGluR6 (metabotropic) > TRPM1 channel. Glutamate CLOSES TRPM1, so light (less glutamate) DEPOLARISES the cell = sign-inverting. Axon ends in IPL sublamina b (inner).',1),
+  P3=part('OFF bipolar cell','Receptors: AMPA/kainate (ionotropic, excitatory). Glutamate DEPOLARISES it, so light HYPERPOLARISES it = sign-conserving. Axon ends in sublamina a (outer).',1),
+  P4=part('Horizontal cell','Lateral inhibition (feedback to photoreceptors) gives centre-surround receptive fields and contrast enhancement.',1),
+  P5=part('IPL sublaminae a / b','Sublamina a (outer) = OFF; sublamina b (inner) = ON. Two parallel pathways code light increments and decrements.',1),
+  P6=part('ON ganglion cell','Fires faster when light turns ON in its centre.',1),
+  P7=part('OFF ganglion cell','Fires faster when light turns OFF (dark spot / light decrement).',1),
+  P8=part('Optic nerve fibres','Ganglion-cell axons converge at the optic disc. Tap to see the fundus + disc.',1,'E:fundus');
+ EYX.ls=false;EYX.btn.eyls=b=>{EYX.ls=!EYX.ls;b.textContent=EYX.ls?'Light: ON':'Light: OFF';b.classList.toggle('on',EYX.ls)};
+ const cone=sp(0,-1.5,0,.5,.18,.2,0xa78bfa,P1,.95);tb([[0,-1.65,0],[0,-2.4,0]],.08,0xa78bfa,P1,.9);
+ [-1.2,1.2].forEach(x=>sp(x,-1.5,0,.3,.12,.15,0x6a58a8,P1,.6));
+ sp(0,-1.15,0,1.0,.05,.1,0x40c8c0,P4,.9);
+ const onb=sp(-.45,0,0,.15,.22,.15,0x40e0d0,P2,.95),ofb=sp(.45,0,0,.15,.22,.15,0xff9f60,P3,.95);
+ tb([[-.45,-.2,0],[-.3,-.9,0],[-.05,-1.4,0]],.02,0x40e0d0,P2,.9);sp(-.05,-1.42,0,.07,.07,.07,0x40e0d0,P2,1);tb([[-.45,.2,0],[-.45,1.0,0],[-.45,1.85,0]],.02,0x40e0d0,P2,.9);sp(-.45,1.9,0,.09,.07,.09,0x40e0d0,P2,1);
+ tb([[.45,-.2,0],[.4,-.9,0],[.25,-1.4,0]],.02,0xff9f60,P3,.9);bx(.25,-1.4,0,.3,.04,.1,0xff9f60,P3,.95);tb([[.45,.2,0],[.45,.8,0],[.45,1.3,0]],.02,0xff9f60,P3,.9);sp(.45,1.35,0,.09,.07,.09,0xff9f60,P3,1);
+ bx(0,1.35,-.1,1.6,.03,.1,0xffb890,P5,.7);bx(0,1.9,-.1,1.6,.03,.1,0x90f0e8,P5,.7);
+ const gon=sp(-.45,2.6,0,.18,.18,.12,0x40e0d0,P6,.95),gof=sp(.45,2.6,0,.18,.18,.12,0xff9f60,P7,.95);
+ tb([[-.45,2.45,0],[-.45,1.9,0]],.015,0x40e0d0,P6,.8);tb([[.45,2.45,0],[.45,1.35,0]],.015,0xff9f60,P7,.8);
+ const ax=poly([[-.45,2.7,0],[-.45,3.3,0],[-.2,3.7,0]]),ax2=poly([[.45,2.7,0],[.45,3.3,0],[.2,3.7,0]]);tb([[-.45,2.7,0],[-.45,3.3,0],[-.2,3.7,0]],.02,0xf2e08a,P8,.9);tb([[.45,2.7,0],[.45,3.3,0],[.2,3.7,0]],.02,0xf2e08a,P8,.9);
+ const gl=[];for(let k=0;k<14;k++)gl.push({m:dc(new T.SphereGeometry(.03,8,6),0x9fffd0,0,0,0,{op:1}),u:k/14,s:k%2?1:-1});
+ const sk=[0,1,2].map(k=>({a:dc(new T.SphereGeometry(.05,8,6),0x40ffe0,0,0,0,{op:1}),b:dc(new T.SphereGeometry(.05,8,6),0xffb060,0,0,0,{op:1}),o:k/3}));
+ let v=0,t0=0;fx.push(s=>{const dt=Math.min(.1,s-t0);t0=s;v+=((EYX.ls?1:0)-v)*.06;const dark=1-v;
+  cone.material.opacity=.45+.5*dark;onb.material.opacity=.4+.55*v;ofb.material.opacity=.4+.55*dark;gon.material.opacity=.4+.55*v;gof.material.opacity=.4+.55*dark;
+  gl.forEach(g=>{g.u=(g.u+dt*(.15+.45*dark))%1;g.m.visible=g.u<dark+.1;g.m.position.set(g.s*.5*g.u,-1.4+.9*g.u,0)});
+  sk.forEach(k=>{const u=((s*.7+k.o)%1);k.a.visible=v>.5;k.b.visible=v<.5;k.a.position.copy(ax.getPointAt(u));k.b.position.copy(ax2.getPointAt(u))});
+  txt(EYX.ls?'LIGHT: cone hyperpolarised, less glutamate > ON bipolar DEPOLARISES > ON ganglion FIRES; OFF bipolar hyperpolarises, OFF ganglion quiet':'DARK: cone releases glutamate > ON bipolar hyperpolarised (mGluR6), OFF bipolar depolarised (AMPA) > OFF ganglion fires')});
+ lb([['Cone terminal',[-1.2,-1.8,0]],['Horizontal cell',[1.0,-1.0,0]],['ON bipolar (mGluR6)',[-1.1,.1,0]],['OFF bipolar (AMPA)',[1.1,.1,0]],['Sublamina a (OFF)',[1.3,1.4,0]],['Sublamina b (ON)',[-1.3,1.95,0]],['ON ganglion',[-1.15,2.65,0]],['OFF ganglion',[1.15,2.65,0]]]);
+ return {t:'ON / OFF signal processing',s:'Light button: ON pathway vs OFF pathway | part par tap karein',rd:9,rm:14,cam:[0,.03],tg:[0,.7,0],ex:'<button id="eyls">Light: OFF</button>'}}];
+
+/* ---------- FUNDUS: optic disc, macula, blind spot ---------- */
+EYX.N.fundus=['Fundus + optic disc',c=>{
+ const {ad,tb,sp,bx,lb,txt}=c,
+  P1=part('Optic disc (blind spot)','Ganglion-cell axons leave and vessels enter here. NO rods/cones = blind spot, ~15 degrees temporal to fixation (~5x7 degrees). The brain fills the gap in. Tap for the visual pathway.',1,'E:nerve'),
+  P2=part('Cup + rim','Central pale cup (cup:disc ratio ~0.3 normal). Glaucoma loses rim tissue: cup enlarges (0.8 = advanced). Use the button.',1),
+  P3=part('Macula + fovea','Macula (~5.5 mm) with the foveal pit at the centre: only cones, no vessels = sharpest vision. Dark/reddish because of RPE + xanthophyll pigment.',1),
+  P4=part('Retinal arteries','Central retinal artery (end artery of the ophthalmic artery) branches on the disc: superior + inferior temporal and nasal arcades. Occlusion (CRAO) = sudden painless blindness, cherry-red spot.',1),
+  P5=part('Retinal veins','Darker, wider than arteries; accompany them. Papilloedema = swollen disc from raised intracranial pressure.',1),
+  P6=part('Retina (periphery)','Orange-red due to choroidal blood seen through the thin retina + RPE.',1),
+  P7=part('Blind spot test','Close your LEFT eye, stare at the +, move the page closer/further (~25 cm): the dot vanishes when its image falls on the optic disc. Your brain fills the hole with the background.',1);
+ EYX.cup=false;EYX.btn.eycp=b=>{EYX.cup=!EYX.cup;b.textContent=EYX.cup?'Cup:disc 0.8':'Cup:disc 0.3';b.classList.toggle('on',EYX.cup)};
+ ad(new T.CircleGeometry(1.6,64),0xd9603b,0,0,0,{op:.97},P6);ad(new T.RingGeometry(1.5,1.6,64),0x7a2a1a,0,0,.01,{op:.9},P6);
+ const D=[.75,-.1];ad(new T.CircleGeometry(.3,40),0xf2c9a0,D[0],D[1],.02,{op:1},P1);
+ const cup=ad(new T.CircleGeometry(1,32),0xfff0cf,D[0],D[1],.03,{op:1,s:[.14,.14,1]},P2);
+ ad(new T.CircleGeometry(.34,40),0xb8452c,-.5,-.05,.02,{op:.9},P3);sp(-.5,-.05,.03,.06,.06,.01,0x7a2a14,P3,1);
+ const arc=(sg,dy,o)=>[[D[0],D[1],.04],[D[0]-.3,D[1]+sg*(.5+o),.04],[D[0]-1.0,D[1]+sg*(.95+o),.04],[-.45,D[1]+sg*(.55+o*.4),.04],[-1.2,D[1]+sg*(.5+o),.04]];
+ [1,-1].forEach(sg=>{tb(arc(sg,0,0),.025,0xb71c1c,P4,.98);tb(arc(sg,0,.07),.035,0x6a1020,P5,.98);tb([[D[0],D[1],.04],[D[0]+.45,D[1]+sg*.35,.04],[D[0]+.8,D[1]+sg*.5,.04]],.022,0xb71c1c,P4,.98);tb([[D[0],D[1],.04],[D[0]+.4,D[1]+sg*.45,.04],[D[0]+.7,D[1]+sg*.7,.04]],.03,0x6a1020,P5,.98)});
+ bx(0,-2.6,0,2.8,.55,.02,0xf8f8f8,P7,.98);bx(-1.05,-2.6,.02,.3,.04,.01,0x111111,P7,1);bx(-1.05,-2.6,.02,.04,.3,.01,0x111111,P7,1);ad(new T.CircleGeometry(.12,24),0x111111,.9,-2.6,.02,{op:1},P7);
+ fx.push(s=>{const u=EYX.cup?.24:.14;cup.scale.x+=(u-cup.scale.x)*.08;cup.scale.y=cup.scale.x;txt(EYX.cup?'Glaucomatous cupping: cup:disc ~0.8, rim thinned, vessels bayonet over the edge':'Normal disc: cup:disc ~0.3. No photoreceptors on the disc = blind spot')});
+ lb([['Optic disc',[1.2,.45,0]],['Cup',[.75,-.55,0]],['Macula / fovea',[-.5,-.55,0]],['Artery',[-.4,1.2,0]],['Vein',[.1,-1.2,0]],['Blind-spot test',[0,-3.0,0]]]);
+ return {t:'Fundus: disc, macula, blind spot',s:'Left-eye fundus | cup button = glaucoma | disc par tap = visual pathway',rd:5.8,rm:10,cam:[0,.03],tg:[0,-.5,0],ex:'<button id="eycp">Cup:disc 0.3</button>'}}];
+
+/* ---------- NERVE: visual pathway ---------- */
+EYX.N.nerve=['Visual pathway',c=>{
+ const {tb,sp,bx,dc,poly,lb,txt}=c,
+  P1=part('Optic nerve (CN II)','Retina to chiasma (~50 mm). Damage = total blindness in that eye + RAPD. Optic neuritis (multiple sclerosis).',1),
+  P2=part('Optic chiasma','NASAL retinal fibres (red) cross; TEMPORAL fibres (blue) stay. Pituitary tumour compresses it = bitemporal hemianopia.',1),
+  P3=part('Optic tract','Carries fibres for the OPPOSITE visual field of both eyes. Lesion = contralateral homonymous hemianopia.',1),
+  P4=part('Lateral geniculate nucleus','Thalamic relay with 6 layers (magno + parvo + konio cells); input is retinotopic.',1),
+  P5=part('Optic radiations','Upper fibres (parietal) = inferior field; lower fibres loop through the temporal lobe (Meyer loop) = superior field: temporal lesion = "pie in the sky".',1),
+  P6=part('Primary visual cortex (V1)','Calcarine sulcus of the occipital lobe; macula has a huge representation. Occipital infarct = homonymous hemianopia with macular sparing.',1),
+  P7=part('Pituitary (relation)','Sits just below the chiasma in the sella turcica.',1);
+ const RED=0xff7a6a,BLU=0x6fb0ff,paths=[];
+ [-1,1].forEach(s=>{sp(s*.9,-2.0,0,.4,.4,.25,0xf2eee6,P1,.95);
+  const nas=[[s*.8,-1.65,0],[s*.35,-1.1,0],[0,-.9,0],[-s*.35,-.4,0],[-s*.75,.6,0]],tem=[[s*1.0,-1.65,0],[s*.95,-1.0,0],[s*.85,-.1,0],[s*.75,.6,0]];
+  tb(nas.slice(0,3),.045,RED,P1,.95);tb(nas.slice(2),.045,RED,P3,.95);tb(tem.slice(0,2),.045,BLU,P1,.95);tb(tem.slice(1),.045,BLU,P3,.95);
+  sp(s*.75,.6,0,.2,.2,.2,0xc8a0ff,P4,.95);
+  const rad=[[s*.75,.7,0],[s*1.4,1.1,0],[s*1.2,1.8,0],[s*.7,2.3,0]];tb(rad,.06,0xc8a0ff,P5,.95);sp(s*.55,2.4,0,.4,.2,.2,0xffb86a,P6,.95);
+  paths.push({cp:poly([...nas,[-s*.75,.7,0],[-s*1.4,1.1,0],[-s*1.2,1.8,0],[-s*.55,2.35,0]]),c:RED},{cp:poly([...tem,[s*1.4,1.1,0],[s*1.2,1.8,0],[s*.55,2.35,0]]),c:BLU})});
+ sp(0,-.9,0,.16,.08,.1,0xffffff,P2,.8);sp(0,-.6,0,.22,.14,.14,0xffb0c0,P7,.9);
+ const D=paths.map(p=>[0,1,2,3,4,5].map(()=>dc(new T.SphereGeometry(.035,8,6),p.c,0,0,0,{op:1})));
+ fx.push(s=>{paths.forEach((p,i)=>D[i].forEach((d,j)=>d.position.copy(p.cp.getPointAt((s*.12+j/6)%1))));txt('Left visual field > right brain, right field > left brain: nasal fibres cross at the chiasma')});
+ lb([['Eye',[-1.8,-2.0,0]],['Optic nerve',[-1.7,-1.2,0]],['Chiasma',[0,-1.25,0]],['Pituitary',[.1,-.4,0]],['Optic tract',[-1.1,0,0]],['LGN',[-1.35,.6,0]],['Radiations',[-1.9,1.35,0]],['V1',[0,2.8,0]]]);
+ return {t:'Visual pathway',s:'Eye > chiasma > tract > LGN > radiations > V1 (nasal fibres cross)',rd:7,rm:11.5,cam:[0,.03],tg:[0,.4,0]}}];
+}
+/* ---- v7 EYE: muscles, nerves and orbit bones (muscles > orbit) ---- */
+{
+const SPH=(a,m,r)=>[r*Math.sin(a)*Math.cos(m),r*Math.sin(a)*Math.sin(m),r*Math.cos(a)];
+/* ---------- MUSCLES (right eye, oblique view) ---------- */
+EYX.N.muscles=['Extraocular muscles',c=>{
+ const {ad,tb,sp,bx,lb,txt}=c,M={},
+  PG=part('Globe','Eyeball (right eye, seen from the front-lateral side).',1),
+  mu=(key,name,info,pts,col,r)=>{const P=part(name,info,1);M[key]={P,m:tb(pts,r||.1,col,P,.95),col};return P},
+  RD=0xc0504a,OR=0xd9803a;
+ sp(0,0,0,1,1,1,0xf2eee6,PG,.92);sp(0,0,.97,.3,.3,.05,0x4aa3a8,PG,.98);
+ mu('sr','Superior rectus','Origin: annulus of Zinn. Insertion: superior sclera. Action: ELEVATES (+ adducts, intorts). Nerve: CN III (superior division).',[[0,.22,-2.8],[0,.5,-1.8],SPH(2.5,1.5708,1.1),SPH(1.8,1.5708,1.08),SPH(1.0,1.5708,1.05)],RD);
+ mu('ir','Inferior rectus','Origin: annulus of Zinn. Insertion: inferior sclera. Action: DEPRESSES (+ adducts, extorts). Nerve: CN III (inferior division). Trapped in blow-out fractures.',[[0,-.22,-2.8],[0,-.5,-1.8],SPH(2.5,-1.5708,1.1),SPH(1.8,-1.5708,1.08),SPH(1.0,-1.5708,1.05)],RD);
+ mu('lr','Lateral rectus','Origin: annulus of Zinn. Insertion: lateral sclera. Action: ABDUCTS. Nerve: CN VI (abducens): LR6.',[[.22,0,-2.8],[.5,0,-1.8],SPH(2.5,0,1.1),SPH(1.8,0,1.08),SPH(1.0,0,1.05)],RD);
+ mu('mr','Medial rectus','Origin: annulus of Zinn. Insertion: medial sclera. Action: ADDUCTS (strongest rectus). Nerve: CN III (inferior division).',[[-.22,0,-2.8],[-.5,0,-1.8],SPH(2.5,3.1416,1.1),SPH(1.8,3.1416,1.08),SPH(1.0,3.1416,1.05)],RD);
+ mu('so','Superior oblique','Origin: sphenoid (near the annulus). Runs forward through the TROCHLEA (pulley), then back-laterally under the superior rectus. Action: INTORTS, depresses (when adducted), abducts. Nerve: CN IV (trochlear): SO4.',[[-.2,.2,-2.8],[-.45,.75,-1.4],[-.6,.98,.2],[-.62,1.0,.78],[-.2,1.06,.3],[.4,.95,-.05],[.81,.56,-.34]],OR,.075);
+ mu('io','Inferior oblique','Origin: maxilla (orbital floor, anterior-medial). Passes under the globe to the posterior-lateral sclera. Action: EXTORTS, elevates (when adducted), abducts. Nerve: CN III (inferior division).',[[-.62,-.95,.7],[-.2,-1.12,.05],[.35,-1.0,-.3],[.59,-.74,-.43]],OR,.075);
+ mu('lv','Levator palpebrae superioris','Origin: lesser wing of sphenoid. Inserts into the upper eyelid tarsus. Elevates the upper lid. Nerve: CN III (superior division). Palsy = ptosis.',[[0,.45,-2.6],[0,1.25,-.8],[0,1.45,.7],[0,1.1,1.25]],0xe8a0a0,.07);
+ sp(-.62,1.0,.78,.07,.07,.04,0xf2e08a,PG,.95);
+ const PZ=part('Annulus of Zinn','Fibrous ring at the orbital apex: origin of the four recti. Optic nerve + CN III, VI + nasociliary pass through it.',1);ad(new T.TorusGeometry(.3,.05,8,24),0xe8dcc0,0,0,-2.8,{op:.95},PZ);
+ const PO=part('Optic nerve (CN II)','Passes through the optic canal and the annulus of Zinn. Tap for the visual pathway.',1,'E:nerve');tb([[0,0,-.98],[0,0,-1.8],[0,0,-3.7]],.11,0xf2e08a,PO,.95);
+ const P3=part('Oculomotor nerve (CN III)','Superior division: SR + levator. Inferior division: MR, IR, IO + parasympathetic to the ciliary ganglion (pupil + accommodation). Palsy = "down and out" eye + ptosis + dilated pupil.',1);
+ const P4=part('Trochlear nerve (CN IV)','Thinnest, longest intracranial course; the only nerve leaving the brainstem dorsally. Supplies the superior oblique.',1);
+ const P6=part('Abducens nerve (CN VI)','Supplies the lateral rectus; long course = vulnerable to raised intracranial pressure. Palsy = cannot abduct, convergent squint.',1);
+ const J=[0,0,-3.3];
+ tb([J,[0,.3,-2.2],[0,.66,-.9]],.02,0xf2e08a,P3,.95);tb([J,[0,-.3,-2.2],[0,-.66,-.9]],.02,0xf2e08a,P3,.95);tb([J,[-.3,0,-2.2],[-.66,0,-.9]],.02,0xf2e08a,P3,.95);tb([[0,-.5,-2.3],[-.3,-.9,-.2],[-.4,-1.02,.3]],.02,0xf2e08a,P3,.95);
+ tb([[-.1,.3,-3.4],[-.4,.8,-1.8],[-.5,.98,-.3]],.02,0x8bd28b,P4,.95);tb([[.1,0,-3.4],[.5,0,-2.4],[.75,0,-1.4]],.02,0x7fb2ff,P6,.95);
+ const PB=part('Orbital walls (bones)','Bony pyramid: roof = frontal, floor = maxilla + zygomatic + palatine, medial = ethmoid + lacrimal, lateral = zygomatic + greater wing of sphenoid. Tap for bones + foramina.',1,'E:orbit');
+ bx(0,1.6,-1.2,2.4,.06,3.8,0xe9dfa8,PB,.13);bx(0,-1.6,-1.2,2.4,.06,3.8,0xd8c3a0,PB,.13);bx(1.5,0,-1.2,.06,3.2,3.8,0xe0d0c0,PB,.13);bx(-1.5,0,-1.2,.06,3.2,3.8,0xd0e0d0,PB,.13);
+ EYX.gz=0;const GZ=[['Look RIGHT: right LR + left MR (yoked pair)',['lr']],['Look LEFT: right MR + left LR',['mr']],['Look UP: SR + IO (both eyes elevate)',['sr','io']],['Look DOWN: IR + SO (both eyes depress)',['ir','so']]];
+ EYX.btn.eygz=b=>{EYX.gz=(EYX.gz+1)%4;b.textContent=GZ[EYX.gz][0].split(':')[0]};
+ fx.push(s=>{const a=GZ[EYX.gz][1],w=.5+.5*Math.sin(s*5);Object.keys(M).forEach(k=>M[k].m.material.color.setHex(a.includes(k)?(w>.5?0xff9a8a:0xff5a4a):M[k].col));txt(GZ[EYX.gz][0]+' (button se badlein)')});
+ lb([['SR',[0,1.05,-1.3]],['IR',[0,-1.05,-1.3]],['LR',[1.0,0,-1.8]],['MR',[-1.0,0,-1.8]],['SO',[-.35,1.25,.0]],['IO',[-.2,-1.3,.2]],['Trochlea',[-.9,1.2,.8]],['Optic nerve',[.4,.3,-3.4]],['Annulus of Zinn',[.7,.5,-2.8]],['Levator',[.5,1.5,.7]]]);
+ return {t:'Extraocular muscles + nerves',s:'Gaze button: kaun si muscle kaam karti hai | LR6 SO4 AO3',rd:8,rm:12.5,cam:[.6,.25],tg:[0,0,-1],ex:'<button id="eygz" class="on">Look RIGHT</button>'}}];
+
+/* ---------- ORBIT: bones + foramina ---------- */
+EYX.N.orbit=['Orbit bones',c=>{
+ const {ad,tb,sp,bx,lb,txt}=c,
+  PF=part('Frontal bone (roof)','Orbital roof + supraorbital margin; holds the lacrimal gland fossa and the trochlear pit. Supraorbital notch/foramen: supraorbital nerve (V1).',1),
+  PZ=part('Zygomatic bone (lateral wall + rim)','Strong lateral rim + part of the lateral wall (with the greater wing of sphenoid). Zygomatic fracture can flatten the cheek and cause diplopia.',1),
+  PM=part('Maxilla + palatine (floor)','Thin floor over the maxillary sinus: "blow-out" fracture lets the inferior rectus/orbital fat herniate = diplopia on up-gaze, infraorbital numbness.',1),
+  PE=part('Ethmoid + lacrimal (medial wall)','Lamina papyracea (paper-thin ethmoid) = easy spread of sinus infection (orbital cellulitis). Lacrimal bone holds the lacrimal sac fossa.',1),
+  PS=part('Sphenoid (apex + lesser/greater wings)','Forms the apex with the optic canal (lesser wing) and the superior orbital fissure between the two wings.',1),
+  PA=part('Optic canal','CN II + ophthalmic artery (in the lesser wing of sphenoid).',1),
+  PB=part('Superior orbital fissure','CN III, IV, VI, ophthalmic division V1 (lacrimal, frontal, nasociliary) + superior ophthalmic vein. Injury = ophthalmoplegia + ptosis + dilated pupil.',1),
+  PI=part('Inferior orbital fissure','Maxillary nerve V2 (zygomatic branch), infraorbital vessels, inferior ophthalmic vein tributaries; continues as the infraorbital canal.',1),
+  PN=part('Infraorbital foramen','Exit of the infraorbital nerve (V2) on the maxilla ~1 cm below the rim: sensation of cheek + upper lip.',1),
+  PL=part('Nasolacrimal canal','Tears drain: puncta > canaliculi > lacrimal sac > nasolacrimal duct > inferior meatus of the nose. Blocked duct = watering eye (epiphora).',1),
+  plate=(a,b,w,col,P,vert)=>{const m=ad(new T.BoxGeometry(w,.08,1),col,(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2,{op:.55},P);m.lookAt(V3(b));if(vert)m.rotateZ(Math.PI/2);m.scale.z=Math.hypot(b[0]-a[0],b[1]-a[1],b[2]-a[2]);return m};
+ plate([0,.95,1.2],[0,.15,-2.8],1.7,0xe9dfa8,PF);plate([0,-.8,1.2],[0,-.15,-2.8],1.5,0xd8b890,PM);plate([-.85,0,1.2],[-.2,0,-2.8],1.4,0xb8e0c0,PE,1);plate([.9,0,1.2],[.25,0,-2.8],1.4,0xd8b8e8,PZ,1);
+ bx(0,0,-2.9,.9,.9,.1,0xf0b0a0,PS,.6);
+ ad(new T.TorusGeometry(.1,.025,8,20),0xffd24a,-.15,.2,-2.84,{op:1},PA);ad(new T.TorusGeometry(.1,.025,8,20),0x6fe0a0,.15,-.05,-2.84,{op:1,s:[2.2,.6,1]},PB);
+ tb([[.55,-.5,-1.2],[.35,-.35,-2.0],[.25,-.25,-2.8]],.035,0x6fb0ff,PI,.95);ad(new T.TorusGeometry(.07,.02,8,16),0xff9f60,0,-1.0,1.25,{op:1},PN);ad(new T.TorusGeometry(.07,.02,8,16),0xffe36a,-.3,.97,1.25,{op:1},PF);
+ tb([[-.75,-.35,1.0],[-.75,-.8,.9],[-.7,-1.5,.5]],.04,0x6fe0e8,PL,.95);
+ lb([['Frontal',[0,1.2,.0]],['Zygomatic',[1.35,0,.2]],['Maxilla (floor)',[0,-1.2,.2]],['Ethmoid + lacrimal',[-1.5,.35,.3]],['Sphenoid',[0,.8,-2.9]],['Optic canal',[-.6,.5,-2.9]],['SOF',[.7,-.35,-2.9]],['IOF',[.8,-.65,-1.8]],['Infraorbital foramen',[0,-1.3,1.3]],['Nasolacrimal canal',[-1.1,-1.0,.9]]]);
+ txt('Orbit = 7 bones: frontal, zygomatic, maxilla, sphenoid, ethmoid, lacrimal, palatine');
+ return {t:'Orbit: 7 bones + openings',s:'Bony pyramid + foramina | part par tap karein',rd:8,rm:12.5,cam:[.5,.3],tg:[0,0,-.8]}}];
+}
 })();
 /* ---- CAPTION + DRAG ---- */
 let CAP=true;const DET='Detail mode: internal composition and flow relationships.',LIVE='Live: Heart 72 bpm, Lungs 15/min. Muscles ON: biceps contracts, triceps relaxes';

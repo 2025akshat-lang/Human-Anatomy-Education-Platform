@@ -1673,7 +1673,7 @@ tg.set(0,-.1,.2);tth=th=.4;tel=el=.85};
    Tree:  Eye(root) -> cornea -> stroma | iris -> plr | lens -> aqueous | retina -> photo -> cascade | onoff
                     -> fundus(optic disc) -> nerve(visual pathway) | muscles -> orbit
    A part with micro-code 'E:<id>' opens node <id>. The X button walks back up the stack. */
-const EYX={N:{},st:[],on:false,br:true,lt:true,btn:{}};
+const EYX={N:{},st:[],on:false,br:true,lt:true,vert:false,btn:{}};
 {
 EYX.ctx=()=>{const EG=new T.Group();G2.add(EG);const por=innerWidth/innerHeight<.8;
  const ad=(g,col,x,y,z,o,P)=>add(g,col,x,y,z,Object.assign({},o||{},{g:EG}),P),
@@ -1693,16 +1693,16 @@ EYX.show=id=>{init();reset();ret=null;live=false;kind='ey_'+id;EYX.btn={};EYX.lp
  curV=()=>EYX.show(id);ret=EYX.st.length>1?EYX.back:null};
 EYX.go=id=>{EYX.st.push(id);EYX.show(id)};EYX.back=()=>{EYX.st.pop();EYX.show(EYX.st[EYX.st.length-1])};
 $('#dl').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&EYX.btn[b.id]){e.stopPropagation();EYX.btn[b.id](b)}},true);
-$('#dn').addEventListener('click',e=>{if(e.target.id=='mv'&&selP&&/^E:/.test(selP.v||'')){e.stopPropagation();EYX.go(selP.v.slice(2))}},true);
-new MutationObserver(()=>{const b=$('#mv');if(b&&selP&&/^E:/.test(selP.v||''))b.textContent='Open inside \u25B8'}).observe($('#dn'),{childList:true});
+{const dn=$('#dn'),_dn=dn.onclick;dn.onclick=e=>{if(e.target&&e.target.id=='mv'&&selP&&/^E:/.test(selP.v||'')){EYX.go(selP.v.slice(2));return}if(_dn)_dn(e)}}/* the floating red 'Micro view' button calls #dn.onclick directly, so wrap the handler itself */
+new MutationObserver(()=>{if(!selP||!/^E:/.test(selP.v||''))return;const b=$('#mv'),f=document.getElementById('mvf');if(b)b.textContent='Open inside \u25B8';if(f)f.textContent='Open inside \u25B6'}).observe($('#dn'),{childList:true});
 {const _o4=window.openDV;window.openDV=(m,lv)=>{if(m.userData.name!=='Eye')return _o4(m,lv);init();cur=m;EYX.st=['root'];EYX.on=!!lv;EYX.br=true;EYX.show('root')}}
 
 /* ---------- ROOT: external eye (light OFF)  /  cross-section + light rays (light ON) ---------- */
 EYX.N.root=['Eye',c=>{
  const {ad,tb,sp,bx,dc,lb,poly,txt,EG}=c,on=EYX.on,
-  ex='<button id="eylt" class="'+(on?'on':'')+'">Light: '+(on?'ON':'OFF')+'</button>'+(on?'<button id="eybr" class="on">'+(EYX.br?'Bright':'Dim')+'</button>':'');
+  ex='<button id="eylt" class="'+(on?'on':'')+'">Light: '+(on?'ON':'OFF')+'</button>'+(on?'<button id="eybr" class="on">'+(EYX.br?'Bright':'Dim')+'</button><button id="eyvw" class="on">'+(EYX.vert?'Vertical':'Horizontal')+'</button>':'');
  EYX.btn.eylt=()=>{EYX.on=!EYX.on;EYX.show('root')};
- EYX.btn.eybr=b=>{EYX.br=!EYX.br;b.textContent=EYX.br?'Bright':'Dim'};
+ EYX.btn.eybr=b=>{EYX.br=!EYX.br;b.textContent=EYX.br?'Bright':'Dim'};EYX.btn.eyvw=()=>{EYX.vert=!EYX.vert;EYX.show('root')};
  const PM=part('Extraocular muscles (6)','Four recti + two obliques rotate the globe (LR6 SO4 AO3: lateral rectus CN VI, superior oblique CN IV, all others CN III). Tap to open muscles, nerves and orbit.',1,'E:muscles');
  if(!on){
   const PS=part('Sclera','White fibrous coat (collagen): keeps the shape, anchors the six extraocular muscles; continuous with the cornea at the limbus.',1);sp(0,0,0,1,1,1,0xf2eee6,PS,.98);
@@ -1720,7 +1720,7 @@ EYX.N.root=['Eye',c=>{
   txt('Roshni OFF: bahar se aankh. "Light" dabao: cross-section + roshni ka raasta');
   return {t:'Eye: external view',s:'Light button: cross-section + light | part par tap karein',rd:3.4,rm:5.2,cam:[0,.1],tg:[0,0,.2],ex}}
  /* ---- light ON: horizontal cross-section, axis along x (rotated to vertical on phones) ---- */
- EG.rotation.z=c.por?-1.5708:0;
+ EG.rotation.z=EYX.vert?-1.5708:0;const SX=-2.4,TT=(-.93-SX)/(-.5-SX);
  const arc=(R,a0,a1,n)=>{const p=[];for(let i=0;i<=n;i++){const t=(a0+(a1-a0)*i/n)*Math.PI/180;p.push([R*Math.cos(t),R*Math.sin(t),0])}return p},
   PS=part('Sclera','White collagen coat; muscles insert here. Continues as the cornea in front.',1),
   PCH=part('Choroid (vascular layer)','Dark vessel-rich layer: nourishes the outer retina, absorbs stray light. With ciliary body + iris = uvea.',1),
@@ -1743,12 +1743,12 @@ EYX.N.root=['Eye',c=>{
  tb([[.88,-.27,0],[1.35,-.4,0],[1.95,-.5,0]],.1,0xf2e08a,PD,.95);
  const PN=part('Optic nerve (CN II)','Leaves the globe nasal to the fovea; ~1.2 million axons. Tap to follow the visual pathway.',1,'E:nerve');tb([[1.5,-.43,0],[1.95,-.5,0],[2.3,-.55,0]],.11,0xf2e08a,PN,.95);
  tb([[1.7,.62,0],[1.0,.98,0],[.3,1.1,0],[-.2,1.03,0],[-.55,.86,0]],.07,0xc0504a,PM,.9);tb([[1.7,-.85,0],[1.0,-1.0,0],[.3,-1.08,0],[-.2,-1.0,0],[-.5,-.87,0]],.07,0xc0504a,PM,.9);
- tb([[-3,-.35,0],[-3,.35,0]],.02,0xffe36a,PO,1);ad(new T.ConeGeometry(.07,.16,12),0xffe36a,-3,.43,0,{op:1},PO);
+ tb([[SX,-.35,0],[SX,.35,0]],.02,0xffe36a,PO,1);ad(new T.ConeGeometry(.07,.16,12),0xffe36a,SX,.43,0,{op:1},PO);
  /* rays: 2 source points x 6 aperture heights; rays outside the pupil stop at the iris */
  const SRC=[[.35,0xffe36a],[-.35,0xff9f43]],HL=[-.5,-.3,-.1,.1,.3,.5],rays=[],img=[];
  SRC.forEach(([sy,col])=>{const Iy=-sy*.45,Ix=Math.sqrt(.915*.915-Iy*Iy);img.push([Ix,Iy,col]);
-  HL.forEach(h=>{const C=[-.93,sy+(h-sy)*.812],L=[-.5,h*.8],yIr=Math.abs(C[1]+(L[1]-C[1])*.767),
-   fp=poly([[-3,sy,0],[C[0],C[1],0],[L[0],L[1],0],[Ix,Iy,0]]),cp=poly([[-3,sy,0],[C[0],C[1],0],[-.6,C[1]+(L[1]-C[1])*.767,0]]),
+  HL.forEach(h=>{const C=[-.93,sy+(h-sy)*TT],L=[-.5,h*.8],yIr=Math.abs(C[1]+(L[1]-C[1])*.767),
+   fp=poly([[SX,sy,0],[C[0],C[1],0],[L[0],L[1],0],[Ix,Iy,0]]),cp=poly([[SX,sy,0],[C[0],C[1],0],[-.6,C[1]+(L[1]-C[1])*.767,0]]),
    mat=g=>dc(new T.TubeGeometry(g,30,.007,5),col,0,0,0,{op:.7}),dots=[];
    for(let k=0;k<5;k++)dots.push(dc(new T.SphereGeometry(.022,8,6),col,0,0,0,{op:1}));
    rays.push({yIr,fp,cp,full:mat(fp),cut:mat(cp),dots})})});
@@ -1758,8 +1758,8 @@ EYX.N.root=['Eye',c=>{
   rays.forEach(r=>{const ok=r.yIr<pr;r.full.visible=ok;r.cut.visible=!ok;const q=ok?r.fp:r.cp;r.dots.forEach((d,i)=>d.position.copy(q.getPointAt((s*.35+i/5)%1)))});
   gl.forEach((g,i)=>g.scale.setScalar(1+.35*Math.sin(s*5+i)));
   txt(EYX.br?'Bright light: pupil ~2 mm, thin beam, sharper image, less light':'Dim light: pupil up to 8 mm, wide beam, more light, blurrier edges')});
- lb([['Cornea',[-1.12,.5,0]],['Pupil',[-.72,.18,0]],['Lens',[-.35,-.4,0]],['Retina',[.78,.66,0]],['Fovea',[1.02,.14,0]],['Optic disc',[.95,-.55,0]],['Object',[-3,.66,0]],['Inverted image',[1.25,.3,0]]]);
- return {t:'Eye: light ON, cross-section',s:'Roshni cornea + lens se bend hoke retina par ulti image banati hai | Bright/Dim = pupil',rd:5.2,rm:7.8,cam:[0,.1],tg:c.por?[0,.55,0]:[-.55,0,0],ex}}];
+ lb([['Cornea',[-1.12,.5,0]],['Pupil',[-.72,.18,0]],['Lens',[-.35,-.4,0]],['Retina',[.78,.66,0]],['Fovea',[1.02,.14,0]],['Optic disc',[.95,-.55,0]],['Object',[SX,.66,0]],['Inverted image',[1.25,.3,0]]]);
+ return {t:'Eye: light ON, cross-section',s:'Roshni cornea + lens se bend hoke retina par ulti image banati hai | Bright/Dim = pupil',rd:6.6,rm:EYX.vert?7.6:14,cam:[0,.1],tg:EYX.vert?[0,.5,0]:[-.5,0,0],ex}}];
 }
 /* ---- v7 EYE: anterior segment nodes (cornea > stroma, iris > plr, lens > aqueous) ---- */
 {

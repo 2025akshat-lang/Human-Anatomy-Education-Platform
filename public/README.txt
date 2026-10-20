@@ -29,3 +29,13 @@ Files:
  08-eye-orbit.js     : extraocular muscles + nerves > orbit bones
 
 Kaise chalta hai: part select karo, info card me "Open inside" dabao -> next level. X button ek level peeche.
+JAW + BRAIN PATCH v8 (male + spine + eye + ye; final html me sab included)
+
+Option A: human-atlas-3d.html ko public/ aur gh-pages dono me replace karo.
+Option B: python3 apply_jaw_brain_patch.py public/human-atlas-3d.html -> human-atlas-3d.v8.html
+
+1. 09-jaw-gross.js : proper mandible (body, alveolar process, angle, ramus, coronoid, condyle, chin). TMJ hotspot ab dono condyles par (chhota).
+2. 10-jaw-detail.js: Mandible par tap = Kenhub-style landmarks (13 parts). TMJ par tap = sagittal cross-section:
+   fossa + eminence, condyle, disc (3 regions), 2 compartments, bilaminar zone, capsule, ligaments, lateral pterygoid, muscles, nerve.
+   Buttons: Mouth open/closed, Disc normal/displaced (click).
+3. 11-brain-slices.js: Cerebrum/Cerebellum/Brainstem par tap = brain cross-section: Axial (2 levels), Sagittal, Coronal + MRI(T1) toggle.

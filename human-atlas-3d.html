@@ -2360,6 +2360,447 @@ EYX.N.brain=['Brain: cross-section',c=>{
 /* ---------- routing: any brain structure opens the cross-section ---------- */
 {const _ob=window.openDV;window.openDV=(m,lv)=>{if(/^(Cerebrum|Cerebellum|Brainstem)/.test(m.userData.name)){init();cur=m;EYX.st=['brain'];EYX.show('brain');return}return _ob(m,lv)}}
 }
+/* ---- v9: FEMALE reproductive: root (Book <-> Real body morph) > uterus | ovary | tube ---- */
+{
+const SMC=(pts,n)=>new T.CatmullRomCurve3(pts.map(p=>V3([p[0],p[1],0])),true,'catmullrom',.5).getPoints(n).map(p=>[p.x,p.y]);
+const ELL=(cx,cy,rx,ry,rot,n)=>{const p=[];n=n||28;for(let i=0;i<n;i++){const t=i/n*6.2832,x=rx*Math.cos(t),y=ry*Math.sin(t);p.push([cx+x*Math.cos(rot||0)-y*Math.sin(rot||0),cy+x*Math.sin(rot||0)+y*Math.cos(rot||0)])}return p};
+const SYM=R=>R.concat(R.slice(1,-1).reverse().map(p=>[-p[0],p[1]]));
+const SCL=(pts,cx,cy,k)=>pts.map(p=>[cx+(p[0]-cx)*k,cy+(p[1]-cy)*k]);
+let RO=1;
+const SHP=(c,pts,col,P,op,smooth)=>{const q=smooth?SMC(pts,pts.length*6):pts,m=c.ad(new T.ShapeGeometry(new T.Shape(q.map(p=>new T.Vector2(p[0],p[1])))),col,0,0,0,{op:op||.95},P);m.renderOrder=RO++;return m};
+EYX.h={SMC,ELL,SYM,SCL,SHP};
+const lerp=(a,b,u)=>a+(b-a)*u,grow=(m,u)=>{const b=m.userData.b0||(m.userData.b0=m.scale.clone());m.scale.set(b.x*u,b.y*u,b.z*u);m.visible=u>.02};
+EYX.fu=0;EYX.fb=false;
+
+/* ---------- ROOT: textbook (coronal, flat) <-> real body (sagittal, tilted) ---------- */
+EYX.N.frepro=['Female reproductive',c=>{
+ const {ad,tb,sp,bx,cy,lb,txt,EG}=c,tgt=EYX.fb?1:0,
+  PU=part('Uterus','Pear-shaped muscular organ (~7.5 x 5 x 2.5 cm). In the real body it is ANTEVERTED + ANTEFLEXED: it leans forward over the bladder. Tap to open the cross-section (3 layers + cycle).',1,'E:uterus'),
+  PX=part('Cervix','Lower neck of the uterus (~3 cm) projecting into the vagina; endocervical canal with mucus. Pap smear samples the transformation zone.',1,'E:uterus'),
+  PV=part('Vagina','Muscular tube (~8-10 cm). In the body it slopes DOWN + FORWARD (about 60-70 degrees to the horizontal), not straight down as in the textbook.',1),
+  PT=part('Fallopian (uterine) tubes','~10-12 cm tubes: fimbriae > ampulla (FERTILISATION site) > isthmus > intramural part. Book: spread sideways. Body: they arch backwards over the ovary. Tap for the egg journey.',1,'E:tube'),
+  PO=part('Ovaries','Almond-sized (~3 x 2 x 1 cm): store eggs, make oestrogen + progesterone. Book: beside the uterus. Body: in the ovarian fossa on the lateral pelvic wall, behind + below the tubes. Tap for follicle stages.',1,'E:ovary'),
+  PB=part('Urinary bladder','In FRONT of the uterus (the uterus rests on its top). Full bladder pushes the uterus back.',1),
+  PUr=part('Urethra','Only ~4 cm in females (shorter than in males), opening in front of the vagina: why UTIs are commoner in females.',1),
+  PR=part('Rectum + anus','BEHIND the vagina/uterus. The rectouterine pouch (of Douglas) lies between uterus and rectum: lowest point of the peritoneal cavity.',1),
+  PD=part('Pouch of Douglas','Peritoneal pocket between uterus and rectum; fluid/pus/blood collects here (culdocentesis).',1),
+  PS=part('Pubic symphysis + sacrum','Bony landmarks of the pelvis: symphysis in front, sacrum + coccyx behind. Pelvic inlet shape differs from males (wider, rounder).',1),
+  PCl=part('Clitoris + labia (vulva)','External genital organs: clitoral glans + body, labia minora + majora, vestibule with urethral + vaginal openings.',1),
+  PBk=part('Book vs body: how to read it','A textbook picture is a FRONT (coronal) slice with everything laid flat and symmetric. In the real body the organs are tilted, stacked front-to-back (bladder, uterus, rectum) and the ovaries sit behind the tubes. Use the View button to morph one into the other.',1),
+  PH=part('Myths + facts (sex education)','I-pill, HIV/AIDS, masturbation, sperm formation, menstrual cycle. Tap to open.',1,'E:sexed');
+ EYX.btn.eyfb=()=>{EYX.fb=!EYX.fb;EYX.show('frepro')};
+ const mkG=()=>{const g=new T.Group();EG.add(g);return g},GU=mkG(),GV=mkG(),add2=(g,geo,col,x,y,z,o,P)=>add(geo,col,x,y,z,Object.assign({},o||{},{g}),P);
+ add2(GU,new T.SphereGeometry(1,24,18),0xd9737f,0,.32,0,{s:[.36,.52,.22],op:.9},PU);add2(GU,new T.SphereGeometry(1,20,14),0xff9aa8,0,.3,0,{s:[.17,.34,.07],op:.85},PU);
+ add2(GU,new T.CylinderGeometry(.13,.15,.42,20),0xcf6a78,0,-.1,0,{op:.95},PX);add2(GU,new T.CylinderGeometry(.03,.03,.44,8),0x5a1a24,0,-.1,0,{op:1},PX);
+ add2(GV,new T.CylinderGeometry(.19,.19,1.0,22,1,true),0xe59aa4,0,-.5,0,{op:.5},PV);add2(GV,new T.CylinderGeometry(.09,.09,1.0,16),0x8a3a46,0,-.5,0,{op:.8},PV);add2(GV,new T.TorusGeometry(.2,.04,8,20),0xe59aa4,0,0,0,{r:[1.5708,0,0],op:.9},PV);
+ const pose={u:EYX.fu};
+ const BODY=[],bo=(m)=>{BODY.push(m);return m};
+ const page=bo(bx(0,0,-.3,3.4,3.0,.02,0xffffff,PBk,.18));
+ bo(sp(0,-.45,.85,.34,.3,.3,0xe6c15a,PB,.55));bo(tb([[0,-.72,.82],[0,-1.0,.84],[0,-1.25,.82]],.035,0xf2e08a,PUr,.95));
+ bo(tb([[0,.3,-.9],[0,-.3,-.9],[0,-1.0,-.7],[0,-1.6,-.4]],.17,0xb86a5a,PR,.85));bo(ad(new T.TorusGeometry(.17,.05,8,16),0xd8a090,0,-1.62,-.38,{r:[1.5708,0,0],op:.95},PR));
+ bo(sp(0,-.35,-.35,.1,.2,.1,0xff8f8f,PD,.4));
+ bo(bx(0,-.85,1.32,.2,.55,.16,0xe9e2cf,PS,.95));bo(tb([[0,1.0,-1.35],[0,.3,-1.4],[0,-.5,-1.2],[0,-1.1,-.85]],.12,0xe9e2cf,PS,.95));
+ bo(sp(0,-1.3,1.05,.05,.05,.05,0xf0a0a8,PCl,.98));[-1,1].forEach(s=>bo(sp(s*.14,-1.4,.8,.07,.3,.12,0xe8909a,PCl,.9)));
+ const NT=12,tubes=[-1,1].map(s=>{const bk=new T.CatmullRomCurve3([[s*.22,.58,0],[s*.45,.8,0],[s*.7,.84,0],[s*.9,.64,0],[s*.98,.4,0]].map(V3)).getPoints(NT-1),by=new T.CatmullRomCurve3([[s*.25,-.12,.42],[s*.45,.12,.3],[s*.68,.1,0],[s*.8,-.1,-.12],[s*.78,-.2,-.2]].map(V3)).getPoints(NT-1),
+  ch=[];for(let i=0;i<NT;i++)ch.push(ad(new T.SphereGeometry(1,10,8),0xf0a0b0,0,0,0,{s:[.03+.03*Math.sin(i/NT*3.1),.03+.03*Math.sin(i/NT*3.1),.03+.03*Math.sin(i/NT*3.1)],op:.95},PT));
+  const fim=[0,1,2].map(k=>ad(new T.ConeGeometry(.03,.12,6),0xf5b8c4,0,0,0,{op:.95},PT)),ov=sp(0,0,0,.17,.11,.1,0xf0d98a,PO,.95),lg=ad(new T.CylinderGeometry(.012,.012,1,6),0xe8d49a,0,0,0,{op:.9},PO);
+  return {s,bk,by,ch,fim,ov,lg}});
+ const OB=[[1.02,.22,0],[.78,-.2,-.2]];
+ fx.push(s=>{const tu=tgt;pose.u+=(tu-pose.u)*.045;const u=pose.u;EYX.fu=u;
+  GU.position.set(0,lerp(-.45,-.5,u),lerp(0,.05,u));GU.rotation.x=lerp(0,.97,u);GV.position.copy(GU.position);GV.rotation.x=lerp(0,-.6,u);
+  BODY.forEach(m=>grow(m,u));page.visible=u<.98;page.scale.set(1,1,1);page.material.opacity=.18*(1-u);
+  tubes.forEach(t=>{t.ch.forEach((m,i)=>{const a=t.bk[i],b=t.by[i];m.position.set(lerp(a.x,b.x,u),lerp(a.y,b.y,u),lerp(a.z,b.z,u))});const e=t.ch[NT-1].position;t.fim.forEach((m,k)=>m.position.set(e.x+t.s*.04,e.y+(k-1)*.05,e.z+(k-1)*.03));
+   const o=[lerp(OB[0][0]*t.s,OB[1][0]*t.s,u),lerp(OB[0][1],OB[1][1],u),lerp(OB[0][2],OB[1][2],u)];t.ov.position.set(o[0],o[1],o[2]);
+   const h=t.ch[0].position,dx=o[0]-h.x,dy=o[1]-h.y,L=Math.hypot(dx,dy)||.01;t.lg.position.set((h.x+o[0])/2,(h.y+o[1])/2,(h.z+o[2])/2);t.lg.scale.set(1,L,1);t.lg.rotation.z=Math.atan2(-dx,dy)});
+  txt(u<.3?'BOOK view: flat front (coronal) slice: uterus upright, tubes spread out, ovaries beside it, no bladder/rectum shown':u>.7?'REAL BODY (side view): uterus tilts FORWARD over the bladder, vagina slopes down + forward, rectum behind, ovaries behind the tubes':'Morphing: the book layout folds into the real pelvis')});
+ tth=tgt?1.45:0;
+ const L0=tgt?[['Uterus',[0,.15,.9]],['Cervix',[.0,-.55,.3]],['Vagina',[0,-1.2,-.2]],['Bladder',[0,-.4,1.2]],['Rectum',[0,-.2,-1.15]],['Symphysis',[0,-1.0,1.55]],['Ovary + tube',[.8,.1,-.2]],['Pouch of Douglas',[0,-.35,-.6]],['Urethra',[0,-1.3,1.05]],['Sacrum',[0,.8,-1.6]]]:[['Uterus',[0,.5,.3]],['Cervix',[.45,-.25,.1]],['Vagina',[.45,-.9,.1]],['Fallopian tube',[.6,1.05,.1]],['Ovary',[1.1,.0,.1]],['Fimbriae',[1.3,.55,.1]]];
+ lb(L0,'#ffb0c0');
+ return {t:'Female reproductive: book vs body',s:'View button: textbook diagram <-> real pelvis | part par tap karein',rd:6.5,rm:9.5,cam:[tgt?1.45:0,.12],tg:[0,-.1,0],ex:'<button id="eyfb" class="on">View: '+(tgt?'Real body':'Book')+'</button>'}}];
+
+/* ---------- UTERUS: coronal cross-section, 3 layers, cycle phase ---------- */
+EYX.N.uterus=['Uterus: cross-section',c=>{
+ const {ad,tb,sp,lb,txt}=c,PH=EYX.ph||0,k=[.38,.66,1][PH],ec=[0xb33a3a,0xe58a9a,0xf2a0a8][PH],
+  PP=part('Perimetrium (serosa)','Outer peritoneal covering of the uterus; continuous with the broad ligament.',1),
+  PM=part('Myometrium (3 muscle layers)','Thick smooth muscle (outer longitudinal, middle interlacing "living ligature", inner circular). Contracts in labour, menstrual cramps (prostaglandins) + after delivery to stop bleeding. Fibroids arise here.',1),
+  PE=part('Endometrium','Inner lining: basal layer (stays) + functional layer (built each cycle under oestrogen/progesterone, shed in menstruation). Implantation happens here ~day 6-10 after ovulation. Thickness changes with the button.',1),
+  PC=part('Uterine cavity','Triangular slit space (inverted triangle) when seen from the front.',1),
+  PO=part('Tubal openings (ostia)','Openings of the fallopian tubes at the upper corners (cornua). Intramural part runs through the wall.',1),
+  PX=part('Cervix + endocervical canal','Fibrous neck (~3 cm): internal os (top) to external os (bottom). Mucus changes: thin + stretchy near ovulation (sperm-friendly), thick plug otherwise. Squamocolumnar junction = HPV/cancer site (Pap smear).',1),
+  PV=part('Vaginal wall + fornices','The vagina surrounds the cervix: recesses = anterior, posterior (deepest) and lateral fornices.',1);
+ EYX.btn.eyph=b=>{EYX.ph=((EYX.ph||0)+1)%3;EYX.show('uterus')};
+ const R=[[0,1.04],[.32,1.0],[.55,.9],[.62,.62],[.5,.25],[.3,-.05],[.22,-.3],[.22,-.8],[.18,-1.0],[0,-1.04]],O=SYM(R);
+ SHP(c,SYM([[0,-.55],[.45,-.62],[.58,-.9],[.52,-1.5],[0,-1.5]]),0xd98a92,PV,.95,true);SHP(c,SYM([[0,-.7],[.3,-.72],[.36,-1.0],[.32,-1.5],[0,-1.5]]),0x5a1a24,PV,.95,true);
+ SHP(c,SCL(O,0,0,1.03),0xe8a0a8,PP,.95,true);SHP(c,O,0xd9737f,PM,.97,true);SHP(c,SCL(O,0,.5,.86),0xc0606e,PM,.9,true);SHP(c,SCL(O,0,.5,.72),0xa84a58,PM,.9,true);
+ const EN=SYM([[0,.86],[.2,.84],[.36,.78],[.44,.62],[.36,.4],[.2,.15],[.1,-.05],[.08,-.2],[0,-.2]]);
+ SHP(c,SCL(EN,0,.45,k+.12),0xd88a96,PE,.95,true);SHP(c,SCL(EN,0,.45,k),ec,PE,.97,true);SHP(c,SCL(EN,0,.45,Math.max(.2,k-.45)),0x5a1a24,PC,.9,true);
+ SHP(c,[[-.03,-.15],[.03,-.15],[.04,-1.0],[-.04,-1.0]],0x3a0f18,PX,.95,false);SHP(c,[[-.17,-.35],[.17,-.35],[.2,-.9],[.12,-1.0],[-.12,-1.0],[-.2,-.9]],0xcf6a78,PX,.35,false);
+ if(PH==2){const rn=RN(4);for(let i=0;i<9;i++){const y=.7-i*.07,x=.06+rn()*.05;[-1,1].forEach(sg=>tb([[sg*x,y],[sg*(x+.04),y-.025],[sg*(x),y-.05],[sg*(x+.04),y-.075]].map(p=>[p[0],p[1],0]),.007,0xffc0c8,PE,.9))}}
+ if(PH==0){const rn=RN(8);for(let i=0;i<10;i++)sp((rn()-.5)*.3,.2+rn()*.5,0,.02,.02,.01,0x8a0f1a,PC,1)}
+ [-1,1].forEach(s=>{sp(s*.5,.82,0,.03,.03,.02,0x1a0508,PO,1);tb([[s*.55,.86,0],[s*.8,.95,0],[s*1.0,.98,0]],.035,0xf0a0b0,PO,.95)});
+ lb([['Perimetrium',[-.85,.5,0]],['Myometrium',[.85,.45,0]],['Endometrium',[.6,.7,0]],['Cavity',[-.6,.2,0]],['Tubal opening',[.75,1.15,0]],['Internal os',[.5,-.15,0]],['Cervical canal',[-.55,-.6,0]],['Fornix',[.8,-.7,0]]],'#ffb0c0');
+ txt(['Menstrual phase (days 1-5): functional layer shed with blood','Proliferative phase: oestrogen rebuilds a thick lining (days 6-14)','Secretory phase: progesterone makes it rich, coiled glands: ready for implantation (days 15-28)'][PH]);
+ return {t:'Uterus: layers + cycle',s:'Cycle button: lining thickness | part par tap karein',rd:5.5,rm:8,cam:[0,.05],tg:[0,.1,0],ex:'<button id="eyph" class="on">Phase: '+['Menstrual','Proliferative','Secretory'][PH]+'</button>'}}];
+
+/* ---------- OVARY: follicle stages + ovulation ---------- */
+EYX.N.ovary=['Ovary: follicles',c=>{
+ const {ad,tb,sp,lb,txt}=c,
+  P0=part('Ovary (cortex + medulla)','Cortex: follicles in connective tissue (stroma) under the germinal epithelium; medulla: vessels + nerves entering at the hilum. Contains ~1-2 million follicles at birth, ~300-400 thousand at puberty, only ~400-500 ovulate in a lifetime.',1),
+  P1=part('Primordial follicles','Oocyte (arrested in prophase I) + one flat layer of granulosa cells. Dormant for years; thousands activate each cycle without hormones.',1),
+  P2=part('Primary follicle','Oocyte + one layer of CUBOIDAL granulosa cells. Starts to grow (FSH-independent at first).',1),
+  P3=part('Secondary follicle','Multilayered granulosa, zona pellucida around the oocyte, theca interna (makes androgens) + externa. FSH receptors appear.',1),
+  P4=part('Antral follicle','Fluid-filled space (antrum) appears. Under FSH, one DOMINANT follicle is selected (day ~7); the rest become atretic.',1),
+  P5=part('Graafian (mature) follicle','~20 mm, bulging from the surface. Oocyte in the cumulus oophorus with corona radiata. High oestradiol triggers the LH SURGE; ovulation follows ~24-36 h after the surge begins.',1),
+  P6=part('Ovulation (stigma)','Follicle wall ruptures (LH, prostaglandins, proteases): the oocyte + corona radiata are released and swept into the tube by the fimbriae. The egg lives only ~12-24 h.',1),
+  P7=part('Corpus luteum','Collapsed follicle turns yellow (lutein cells): makes PROGESTERONE + oestrogen for ~14 days. If no pregnancy it regresses; with hCG it is kept alive.',1),
+  P8=part('Corpus albicans','White scar left after the corpus luteum regresses.',1),
+  P9=part('Hilum vessels','Ovarian artery + vein, lymphatics and nerves enter through the mesovarium.',1);
+ EYX.ov=false;EYX.btn.eyov=b=>{EYX.ov=!EYX.ov;b.textContent=EYX.ov?'Ovulation: ON':'Ovulation: OFF';b.classList.toggle('on',EYX.ov)};
+ SHP(c,ELL(0,0,1.0,.66,0,48),0xe6b0a8,P0,.95);SHP(c,ELL(.0,-.02,.7,.4,0,40),0xf4c8c0,P0,.95);
+ tb([[-1.0,-.1,0],[-.6,-.05,0],[-.2,-.02,0]],.03,0xd8232f,P9,.95);tb([[-1.0,.05,0],[-.55,.05,0],[-.15,.0,0]],.03,0x2f6fe0,P9,.95);
+ [[-.7,.42],[-.78,.3],[-.62,.3]].forEach(p=>{sp(p[0],p[1],0,.03,.03,.01,0xfff0d8,P1,1)});
+ const fol=(x,y,r,P,gran,ant,col)=>{sp(x,y,0,r,r,.02,0xe8a090,P,.95);sp(x,y,0,r*.85,r*.85,.02,col||0xf5d0b8,P,.95);if(ant)sp(x,y,0,r*.55,r*.55,.02,0xbfe8ff,P,.9);sp(x-(ant?r*.25:0),y+(ant?r*.2:0),0,r*.2,r*.2,.02,0xfff6e0,P,1)};
+ fol(-.45,.0,.09,P2);fol(-.2,-.22,.15,P3);fol(.08,-.3,.18,P4,1,1);
+ const G=sp(.5,-.12,0,.32,.32,.02,0xe8a090,P5,.95);sp(.5,-.12,0,.28,.28,.02,0xf5d0b8,P5,.95);const GA=sp(.5,-.12,0,.2,.2,.02,0xbfe8ff,P5,.92);sp(.58,-.2,0,.06,.06,.02,0xfff6e0,P5,1);
+ const cl=sp(.4,.28,0,.2,.16,.02,0xf2c84a,P7,.97);sp(.4,.28,0,.08,.06,.02,0xd8232f,P7,1);sp(-.05,.3,0,.07,.06,.02,0xf4f0e8,P8,1);
+ const egg=sp(.5,-.12,0,.06,.06,.03,0xfff6e0,P6,1),corona=sp(.5,-.12,0,.1,.1,.02,0xffe0c0,P6,.7);let u=0;
+ fx.push(s=>{u+=((EYX.ov?1:0)-u)*.03;G.scale.set(.32*(1+.08*u),.32*(1+.08*u),.02);const px=lerp(.58,1.25,u),py=lerp(-.2,.5,u);egg.visible=u>.15;corona.visible=u>.15;egg.position.set(px,py,0);corona.position.set(px,py,0);GA.scale.setScalar(.2*(1-.5*u));txt(EYX.ov?'LH surge > follicle ruptures > oocyte + corona radiata released toward the fimbriae (egg lives ~12-24 h)':'Follicle stages around the ovary: primordial > primary > secondary > antral > Graafian > ovulation > corpus luteum > corpus albicans')});
+ lb([['Primordial',[-.78,.6,0]],['Primary',[-.5,-.2,0]],['Secondary',[-.35,-.5,0]],['Antral',[.0,-.58,0]],['Graafian',[.62,-.55,0]],['Corpus luteum',[.3,.55,0]],['Corpus albicans',[-.2,.55,0]],['Hilum',[-1.15,0,0]]],'#ffb0c0');
+ return {t:'Ovary: follicle stages',s:'Ovulation button | har stage par tap karein',rd:5.2,rm:7.5,cam:[0,.05],tg:[0,0,0],ex:'<button id="eyov">Ovulation: OFF</button>'}}];
+
+/* ---------- TUBE: egg + sperm journey, fertilisation, implantation ---------- */
+EYX.N.tube=['Fallopian tube',c=>{
+ const {ad,tb,sp,cy,dc,lb,txt,EG,por}=c,
+  P1=part('Fimbriae + infundibulum','Finger-like fringe sweeps over the ovary and catches the oocyte. Cilia + peristalsis move it inward.',1),
+  P2=part('Ampulla (fertilisation site)','Widest part (~2/3 of the tube). Sperm meet the egg here within ~12-24 h of ovulation. Ectopic pregnancy usually implants here.',1),
+  P3=part('Isthmus','Narrow part near the uterus; the embryo travels slowly to reach the cavity at ~day 3-4.',1),
+  P4=part('Mucosal folds + cilia','Ciliated + secretory cells: cilia beat toward the uterus; secretions nourish sperm, egg and the early embryo.',1),
+  P5=part('Ovary + follicle','Source of the egg.',1),
+  P6=part('Uterine cavity + endometrium','Implantation ~day 6-10 after ovulation (blastocyst). hCG from the embryo keeps the corpus luteum alive.',1),
+  P7=part('Sperm','~50-60 um; only a few hundred reach the ampulla out of millions deposited; they survive up to ~5 days in cervical mucus.',1),
+  P8=part('Egg > zygote > embryo','Fertilisation (day 0) > 2 cells (day 1) > 4 cells (day 2) > morula (day 3-4, enters uterus) > blastocyst (day 5-6) > implantation (day 6-10).',1);
+ EG.rotation.z=por?-1.5708:0;EYX.tp=false;EYX.btn.eytp=b=>{EYX.tp=!EYX.tp;b.textContent=EYX.tp?'Paused':'Playing';b.classList.toggle('on',!EYX.tp)};
+ const X0=-2.2,rad=x=>x<-1.8?.1:x<.4?.22:x<1.6?.08:.1,pth=x=>.18*Math.sin((x+2.2)*.8);
+ for(let i=0;i<20;i++){const x=-1.8+i*.2,P=x<.4?P2:P3,r=rad(x);cy(x,pth(x),0,r,.22,0xf0a0b0,P,.45,[0,0,1.5708]);cy(x,pth(x),0,r*.55,.22,0x7a2a36,P,.6,[0,0,1.5708]);if(x<.4&&i%2==0)ad(new T.TorusGeometry(r*.8,.02,6,14),0xffc0c8,x,pth(x),0,{r:[0,1.5708,0],op:.9},P4)}
+ for(let k=0;k<7;k++)ad(new T.ConeGeometry(.035,.3,6),0xf5b8c4,-2.0,pth(-1.9)+(k-3)*.07,(k-3)*.03,{op:.95,r:[0,0,1.5708+(k-3)*.22]},P1);
+ sp(-2.5,.7,0,.35,.3,.1,0xf0d98a,P5,.9);sp(-2.45,.55,0,.17,.17,.1,0xbfe8ff,P5,.9);
+ ad(new T.BoxGeometry(1.0,1.1,.3),0xf2a0a8,2.75,.05,0,{op:.9},P6);ad(new T.BoxGeometry(.6,.7,.2),0x5a1a24,2.5,.05,0,{op:.9},P6);
+ const egg=sp(0,0,0,.09,.09,.09,0xfff6e0,P8,1),cell=[];for(let i=0;i<16;i++)cell.push(dc(new T.SphereGeometry(.035,8,6),0xfff0d0,0,0,0,{op:1}));
+ const SPM=[];for(let i=0;i<10;i++)SPM.push({h:dc(new T.SphereGeometry(.025,8,6),0xdfe8ff,0,0,0,{op:1}),tl:dc(new T.CylinderGeometry(.004,.004,.12,4),0xdfe8ff,0,0,0,{op:.9,r:[0,0,1.5708]}),o:i/10});
+ let tt=0,t0=0;const ST=['Ovulation: egg released + caught by the fimbriae','Egg in the ampulla; sperm swim up the tube (survive ~5 days)','FERTILISATION in the ampulla (day 0)','Zygote: 1 cell > 2 cells (day 1) > 4 cells (day 2)','Morula (day 3-4): ~16 cells, enters the uterine cavity','Blastocyst (day 5-6): hatches, then implants in the endometrium (day 6-10)'];
+ fx.push(s=>{const dt=Math.min(.1,s-t0);t0=s;if(!EYX.tp)tt=(tt+dt)%18;const p=tt,ph=p<3?0:p<6?1:p<8?2:p<11?3:p<14?4:5;
+  let ex=-2.45,ey=.55;if(p<3){const u=p/3;ex=lerp(-2.45,-1.7,u);ey=lerp(.55,pth(-1.7),u)}else if(p<8){ex=-1.0;ey=pth(-1.0)}else if(p<14){const u=(p-8)/6;ex=lerp(-1.0,2.3,u);ey=lerp(pth(-1.0),.05,Math.max(0,u-.6)/.4)}else{ex=2.55;ey=lerp(.05,.2,Math.min(1,(p-14)/4))}
+  const n=p<8?1:p<9.5?2:p<11?4:p<14?16:16;egg.visible=p<8;
+  cell.forEach((m,i)=>{m.visible=p>=8&&i<n;const a=i/n*6.2832,r=n>4?.1:.05;m.position.set(ex+Math.cos(a)*r,ey+Math.sin(a)*r,0)});
+  SPM.forEach(q=>{const u=((p*.15+q.o)%1),x=lerp(2.0,-1.0,u),y=pth(x)+Math.sin(p*6+q.o*9)*.04,vis=p>=2&&p<7&&u>0&&(p<6||q.o<.2);q.h.visible=vis;q.tl.visible=vis;q.h.position.set(x,y,0);q.tl.position.set(x+.07,y,0)});
+  if(p<8)egg.position.set(ex,ey,0);txt(ST[ph])});
+ lb([['Fimbriae',[-2.0,.55,0]],['Ovary',[-2.7,1.1,0]],['Ampulla',[-.7,.5,0]],['Isthmus',[1.0,.3,0]],['Uterine cavity',[2.6,.9,0]],['Fertilisation here',[-1.0,-.45,0]]],'#ffb0c0');
+ return {t:'Fallopian tube: fertilisation to implantation',s:'Egg + sperm journey, day 0 to day 10 | Pause button',rd:7.5,rm:8.5,cam:[0,.05],tg:por?[0,.1,0]:[.2,.1,0],ex:'<button id="eytp" class="on">Playing</button>'}}];
+}
+/* ---- v9: MALE reproductive: root (sagittal body, erection, sperm path) > testis > spermatogenesis > sperm | penis | prostate ---- */
+{
+const {SMC,ELL,SYM,SCL,SHP}=EYX.h,lerp=(a,b,u)=>a+(b-a)*u,k01=x=>Math.max(0,Math.min(1,x));
+const STR=(m,a,b,z)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||.001;m.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,z||0);m.scale.set(1,L,1);m.rotation.z=Math.atan2(-dx,dy)};
+EYX.er=false;EYX.sp=true;
+
+/* ---------- ROOT: midsagittal pelvis, face to the LEFT ---------- */
+EYX.N.mrepro=['Male reproductive',c=>{
+ const {ad,tb,sp,bx,cy,dc,lb,txt}=c,
+  PB=part('Urinary bladder','Muscular reservoir (~400-600 mL). Its neck sits on the prostate.',1),
+  PP=part('Prostate','Chestnut-sized gland (~20 g) around the first part of the urethra, just below the bladder, in FRONT of the rectum (felt on rectal examination). Tap for zones, BPH + TURP.',1,'E:prostate'),
+  PS=part('Seminal vesicle + ejaculatory duct','Paired glands behind the bladder: make ~60% of semen (fructose + alkaline fluid). Their duct joins the vas deferens to form the ejaculatory duct through the prostate.',1),
+  PV=part('Vas deferens','Muscular tube from the epididymis tail through the inguinal canal, over the pubis and behind the bladder to the ampulla. Cut in vasectomy: sperm no longer reach the semen, hormones + ejaculate volume stay almost the same.',1),
+  PT=part('Testis + scrotum','Lie outside the body (~2-3 degrees C cooler, needed for sperm). Tap for the testis cross-section.',1,'E:testis'),
+  PE=part('Epididymis','Coiled tube (~6 m uncoiled) on the back of the testis: sperm mature + become motile here (2-12 days) and are stored in the tail.',1),
+  PU=part('Urethra','Prostatic > membranous > spongy (penile) urethra: carries BOTH urine + semen (never together: the bladder neck closes during ejaculation).',1),
+  PPn=part('Penis (corpora)','Two corpora cavernosa (dorsal) + corpus spongiosum (ventral, holds the urethra). Erection = blood filling. Tap for the cross-section.',1,'E:penis'),
+  PG=part('Bulbourethral gland','Pea-sized gland below the prostate: clear pre-ejaculate (lubricates, neutralises acidic urethra). Pre-ejaculate can carry sperm + HIV.',1),
+  PR=part('Rectum + anus','Behind the prostate + seminal vesicles. Internal (involuntary) + external (voluntary) anal sphincters.',1),
+  PY=part('Pubic symphysis + sacrum','Bony pelvic landmarks (front + back).',1),
+  PH=part('Myths + facts (sex education)','I-pill, HIV/AIDS, masturbation, sperm formation, menstrual cycle. Tap to open.',1,'E:sexed');
+ EYX.btn.eyer=b=>{EYX.er=!EYX.er;b.textContent=EYX.er?'Penis: erect':'Penis: flaccid';b.classList.toggle('on',EYX.er)};
+ EYX.btn.eysp=b=>{EYX.sp=!EYX.sp;b.textContent=EYX.sp?'Sperm path: ON':'Sperm path: OFF';b.classList.toggle('on',EYX.sp)};
+ EYX.btn.eybk=()=>{const o=EYX.old;if(o&&EYX.curM)o(EYX.curM,false)};
+ bx(-1.15,-.05,0,.22,.75,.2,0xe9e2cf,PY,.95);tb([[1.3,1.9,0],[1.55,.9,0],[1.45,-.2,0],[1.1,-.9,0]],.13,0xe9e2cf,PY,.95);tb([[-1.45,1.9,0],[-1.3,.6,0],[-1.2,.0,0]],.05,0xe3b79b,PY,.7);
+ sp(-.7,.6,0,.5,.45,.3,0xd9736b,PB,.45);sp(-.7,.6,0,.4,.35,.24,0xf0a0a0,PB,.5);
+ sp(-.55,-.1,0,.28,.24,.25,0xd89a82,PP,.95);sp(-.15,.3,0,.14,.3,.1,0xe3b064,PS,.95);tb([[-.3,.2,0],[-.5,-.05,0]],.025,0xf0d9a6,PS,.95);
+ tb([[-.45,-1.45,0],[-.45,-.9,0],[-.95,-.3,0],[-1.0,.25,0],[-.55,.6,0],[-.15,.45,0],[-.2,.2,0]],.025,0xe7d29b,PV,.95);sp(-.22,.15,0,.06,.1,.05,0xe8d6a4,PV,.95);
+ sp(-.5,-1.3,0,.36,.48,.3,0xd69a91,PT,.2);sp(-.5,-1.3,0,.28,.38,.22,0xe8c998,PT,.95);tb([[-.3,-1.0,0],[-.22,-1.3,0],[-.32,-1.6,0]],.05,0xd9a76f,PE,.95);
+ sp(-.65,-.55,0,.05,.05,.05,0xe5b870,PG,.95);tb([[.7,1.1,0],[.85,.3,0],[.8,-.5,0],[.55,-1.0,0]],.24,0xb86a5a,PR,.85);tb([[.55,-1.0,0],[.45,-1.5,0]],.15,0xb86a5a,PR,.9);ad(new T.TorusGeometry(.16,.04,8,16),0xd8a090,.45,-1.5,0,{op:.95},PR);
+ tb([[-.62,.2,0],[-.58,-.1,0],[-.58,-.4,0],[-.75,-.55,0]],.035,0xf2e08a,PU,.95);
+ const NS=9,cav=[0,1].map(()=>[]),spg=[],ur=[];for(let i=0;i<NS;i++){cav[0].push(cy(0,0,0,1,1,0xc05a64,PPn,.95));cav[1].push(cy(0,0,0,1,1,0xc05a64,PPn,.95));spg.push(cy(0,0,0,1,1,0xb96568,PPn,.95));ur.push(cy(0,0,0,1,1,0xf2e08a,PU,.95))}
+ const gl=sp(0,0,0,.14,.12,.1,0xe1b0a6,PPn,.95);
+ const bez=(t,u)=>{const e=[lerp(-1.7,-2.7,u),lerp(-1.25,-.1,u)],m=[lerp(-1.3,-1.8,u),lerp(-.6,-.45,u)],a=[-.8,-.5],q=1-t;return [q*q*a[0]+2*q*t*m[0]+t*t*e[0],q*q*a[1]+2*q*t*m[1]+t*t*e[1]]};
+ const D=[];for(let i=0;i<9;i++)D.push(dc(new T.SphereGeometry(.035,8,6),0x9fe0ff,0,0,0,{op:1}));
+ const fixed=[[-.45,-1.45],[-.45,-.9],[-.95,-.3],[-1.0,.25],[-.55,.6],[-.15,.45],[-.2,.2],[-.3,.2],[-.5,-.05],[-.58,-.1],[-.58,-.4],[-.75,-.55]];let uu=0,tm=0;
+ fx.push(s=>{uu+=((EYX.er?1:0)-uu)*.04;const u=uu,P=[];for(let i=0;i<=NS;i++)P.push(bez(i/NS,u));
+  const col=[lerp(.75,.85,u),lerp(.35,.14,u),lerp(.39,.18,u)];
+  for(let i=0;i<NS;i++){const a=P[i],b=P[i+1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||.01,nx=-dy/L,ny=dx/L,sg=ny<0?-1:1,o=.1*(1+.3*u);
+   const set=(m,r,off,z)=>{m.position.set((a[0]+b[0])/2+nx*sg*off,(a[1]+b[1])/2+ny*sg*off,z);m.scale.set(r,L*1.05,r);m.rotation.z=Math.atan2(-dx,dy)};
+   set(cav[0][i],.085*(1+.25*u),o,.06);set(cav[1][i],.085*(1+.25*u),o,-.06);set(spg[i],.05,-o*.7,0);set(ur[i],.02,-o*.7,0);cav[0][i].material.color.setRGB(...col);cav[1][i].material.color.setRGB(...col)}
+  gl.position.set(P[NS][0]+(P[NS][0]-P[NS-1][0])*.5,P[NS][1]+(P[NS][1]-P[NS-1][1])*.5,0);
+  const path=fixed.concat(P.map(p=>[p[0],p[1]])).reverse().reverse();let tot=0;const cum=[0];for(let i=1;i<path.length;i++){tot+=Math.hypot(path[i][0]-path[i-1][0],path[i][1]-path[i-1][1]);cum.push(tot)}
+  D.forEach((d,k)=>{d.visible=EYX.sp;const w=((s*.08+k/9)%1)*tot;let j=1;while(j<cum.length-1&&cum[j]<w)j++;const f=(w-cum[j-1])/Math.max(1e-6,cum[j]-cum[j-1]);d.position.set(lerp(path[j-1][0],path[j][0],f),lerp(path[j-1][1],path[j][1],f),.1)});
+  txt(EYX.er?'ERECT: parasympathetic (S2-S4) > NO > cGMP > smooth muscle relaxes > corpora cavernosa fill with blood, veins squeezed shut':'Flaccid. Sperm path: testis > epididymis > vas deferens > behind bladder > ejaculatory duct > urethra > out')});
+ lb([['Bladder',[-.7,1.15,0]],['Prostate',[-.15,-.45,0]],['Seminal vesicle',[.35,.55,0]],['Vas deferens',[-1.35,.45,0]],['Testis',[-1.3,-1.45,0]],['Epididymis',[.05,-1.6,0]],['Pubic symphysis',[-1.6,-.2,0]],['Rectum',[1.25,.5,0]],['Anus',[.95,-1.55,0]],['Penis',[-1.8,-.8,0]],['Urethra',[-.2,-.7,0]]],'#ffd29a');
+ return {t:'Male reproductive: real body (side view)',s:'Flaccid/Erect + Sperm path + Book diagram | part par tap karein',rd:8.2,rm:12.5,cam:[0,.05],tg:[-.55,0,0],ex:'<button id="eyer">Penis: flaccid</button><button id="eysp" class="on">Sperm path: ON</button><button id="eybk">Book diagram</button>'}}];
+
+/* ---------- TESTIS: cross-section ---------- */
+EYX.N.testis=['Testis: cross-section',c=>{
+ const {ad,tb,sp,lb,txt}=c,
+  PT=part('Tunica albuginea','Tough white fibrous capsule (grey-blue in the diagram); thickens posteriorly as the mediastinum testis. Cannot stretch: swelling (torsion, infection) is very painful.',1),
+  PS=part('Septa','Fibrous partitions from the mediastinum to the capsule dividing the testis into ~250 lobules.',1),
+  PL=part('Lobules + seminiferous tubules','Each lobule holds 1-4 highly coiled seminiferous tubules (~80 cm each) where sperm are made. Tap for spermatogenesis.',1,'E:sgenesis'),
+  PR=part('Rete testis + mediastinum','Network of channels collecting sperm from the straight tubules.',1),
+  PEf=part('Efferent ductules','6-12 small ducts carrying sperm from the rete testis to the head of the epididymis.',1),
+  PEH=part('Epididymis (head, body, tail)','Single coiled tube (~6 m): head receives sperm, body = maturation (motility + fertilising ability), tail = storage. Transit 2-12 days.',1),
+  PV=part('Vas deferens','Continues from the tail upward in the spermatic cord.',1),
+  PP=part('Pampiniform plexus + testicular artery','Venous network around the artery: counter-current heat exchange keeps the testis ~2-3 degrees C below body temperature. Varicocele = dilated plexus (infertility cause).',1),
+  PY=part('Interstitium (Leydig cells)','Between the tubules: Leydig cells make TESTOSTERONE under LH.',1);
+ const rot=.35,E=(x,y,rx,ry,n)=>ELL(x,y,rx,ry,rot,n);
+ SHP(c,E(0,-.2,.9,1.05,48),0x6c7a8a,PT,.97);SHP(c,E(0,-.2,.82,.97,48),0xe8a090,PY,.97);
+ const rn=RN(3);for(let i=0;i<55;i++){const a=rn()*6.28,r=Math.sqrt(rn())*.78,x=Math.cos(a)*r*.82,y=Math.sin(a)*r*.97;sp(x*Math.cos(rot)-y*Math.sin(rot),-.2+x*Math.sin(rot)+y*Math.cos(rot),0,.03,.03,.01,0xf0b090,PL,.95)}
+ const M=[-.3,.35];for(let k=0;k<8;k++){const a=1.2+k*.75,px=Math.cos(a)*.82,py=Math.sin(a)*.97,X=px*Math.cos(rot)-py*Math.sin(rot),Y=-.2+px*Math.sin(rot)+py*Math.cos(rot);tb([[M[0],M[1],0],[(M[0]+X)/2,(M[1]+Y)/2,0],[X,Y,0]],.009,0x6c7a8a,PS,.95);
+  const mx=(M[0]+X)/2,my=(M[1]+Y)/2;tb([[mx,my,0],[mx+.07,my+.05,0],[mx+.02,my+.1,0],[mx+.1,my+.15,0],[mx+.05,my+.2,0]].map(p=>[p[0]-.1*Math.cos(a+.4),p[1]-.1*Math.sin(a+.4),0]),.012,0xf5c8a8,PL,.95)}
+ for(let i=0;i<7;i++)tb([[-.35+i*.025,.3,0],[-.3+i*.03,.38+i*.01,0],[-.2+i*.03,.35,0]],.014,0xa02030,PR,.95);
+ for(let i=0;i<7;i++)tb([[-.25+i*.02,.4,0],[-.2+i*.04,.62+(i%2)*.06,0],[-.1+i*.07,.78,0],[.05+i*.07,.88,0]],.011,0xe86a60,PEf,.95);
+ tb([[.6,1.0,0],[.1,1.07,0],[-.4,.92,0],[-.8,.62,0],[-.97,.12,0],[-.97,-.42,0],[-.85,-.92,0]],.1,0xf0a890,PEH,.95);
+ for(let i=0;i<9;i++){const t=i/8;sp(lerp(.55,-.85,Math.min(1,t*1.4))*.95,lerp(1.0,-.9,t*t),0,.11,.11,.08,0xf0a890,PEH,.9)}
+ tb([[-.85,-.95,0],[-1.05,-.4,0],[-1.15,.3,0],[-.9,1.3,0],[-.7,1.9,0]],.05,0xf0a890,PV,.95);
+ for(let k=0;k<4;k++)tb([[-.15+k*.05,.9,0],[-.3+k*.1,1.3,0],[-.2+k*.06,1.6,0],[-.35+k*.08,1.95,0]],.02,0x2f6fe0,PP,.9);tb([[-.1,.9,0],[-.25,1.3,0],[-.3,1.95,0]],.02,0xd8232f,PP,.95);
+ lb([['Tunica albuginea',[1.2,-.8,0]],['Septa',[1.15,.0,0]],['Lobules',[1.0,.5,0]],['Rete testis',[.55,.35,0]],['Efferent ductules',[.9,1.05,0]],['Epididymis head',[.5,1.3,0]],['Epididymis body',[-1.5,.5,0]],['Epididymis tail',[-1.5,-1.0,0]],['Vas deferens',[-1.5,1.3,0]],['Pampiniform plexus',[.6,1.8,0]]],'#ffd29a');
+ txt('Testis cross-section: lobules + coiled seminiferous tubules > rete testis > efferent ductules > epididymis > vas');
+ return {t:'Testis + epididymis',s:'Lobules par tap = sperm formation | like your reference',rd:6,rm:10,cam:[0,.05],tg:[-.1,.45,0]}}];
+
+/* ---------- SPERMATOGENESIS: seminiferous tubule cross-section ---------- */
+EYX.N.sgenesis=['Spermatogenesis',c=>{
+ const {ad,tb,sp,cy,dc,lb,txt}=c,
+  P1=part('Basement membrane + myoid cells','Tubule wall: contractile myoid cells squeeze sperm toward the rete testis.',1),
+  P2=part('Spermatogonia (2n)','Stem cells at the base: divide by MITOSIS (some stay as stem cells, some become primary spermatocytes). Diploid, 46 chromosomes.',1),
+  P3=part('Primary spermatocytes','Large cells that enter MEIOSIS I (~24 days: long prophase with crossing over): 46 duplicated chromosomes > 2 secondary spermatocytes.',1),
+  P4=part('Secondary spermatocytes (n)','Short-lived (hours); MEIOSIS II separates sister chromatids: 23 chromosomes each > 2 spermatids.',1),
+  P5=part('Spermatids (n)','Round haploid cells that undergo SPERMIOGENESIS: nucleus condenses, acrosome forms, flagellum grows, extra cytoplasm shed (residual body). No more division.',1),
+  P6=part('Spermatozoa in the lumen','Released (spermiation) into the lumen: still immotile; matured in the epididymis. Tap for sperm structure.',1,'E:sperm'),
+  P7=part('Sertoli cells + blood-testis barrier','Tall "nurse" cells from base to lumen: support + feed germ cells, tight junctions (orange ring) form the blood-testis barrier (protects haploid cells from the immune system), secrete inhibin + ABP. Controlled by FSH.',1),
+  P8=part('Leydig cells (interstitium)','Between the tubules: LH makes them produce TESTOSTERONE (needed for spermatogenesis + male characteristics).',1),
+  P9=part('Hormonal control','Hypothalamus GnRH > anterior pituitary: FSH (Sertoli cells) + LH (Leydig cells > testosterone). Inhibin (Sertoli) + testosterone feed back negatively on the brain. Whole process ~64-74 days (about 2.5 months) + 2-12 days in the epididymis; ~100 million or more sperm per day.',1);
+ const R=(r,a)=>[Math.cos(a)*r,Math.sin(a)*r,0];
+ tb(Array.from({length:25},(_,i)=>R(1.25,i/24*6.2832)),.025,0xe8d49a,P1,.95);for(let i=0;i<16;i++){const p=R(1.31,i/16*6.2832);sp(p[0],p[1],0,.08,.04,.03,0xd8a0a0,P1,.9)}
+ const RINGS=[[1.12,.09,12,0x6fa8e8,P2],[.92,.14,9,0xe8a0d0,P3],[.76,.1,5,0xd08ae8,P4],[.6,.075,13,0x9ad0a0,P5]];
+ RINGS.forEach(q=>{for(let i=0;i<q[2];i++){const a=(i+.5)/q[2]*6.2832+(q[0]*3),p=R(q[0],a);sp(p[0],p[1],0,q[1],q[1],q[1],q[3],q[4],.95)}});
+ for(let i=0;i<16;i++){const a=i/16*6.2832+.2,p=R(.5,a),t=R(.3,a+.15);sp(p[0],p[1],0,.045,.03,.03,0xf5f0b0,P6,1);tb([[p[0],p[1],0],[(p[0]+t[0])/2+.02,(p[1]+t[1])/2,0],[t[0],t[1],0]],.006,0xf5f0b0,P6,.95)}
+ for(let i=0;i<8;i++){const a=i/8*6.2832+.4;ad(new T.ConeGeometry(.1,.9,8),0xfff2d0,.85*Math.cos(a),.85*Math.sin(a),0,{op:.28,r:[0,0,a-1.5708],s:[1,1.0,1]},P7)}
+ tb(Array.from({length:25},(_,i)=>R(.98,i/24*6.2832)),.012,0xf2a040,P7,.95);
+ for(let i=0;i<4;i++){const a=.8+i*1.57;[0,1,2].forEach(k=>{const p=R(1.72+.04*k,a+k*.08);sp(p[0],p[1],0,.1,.08,.06,0xf2c070,P8,.95)})}tb(Array.from({length:12},(_,i)=>R(1.9,.2+i*.12)),.03,0xd8232f,P8,.9);
+ const hb=ad(new T.BoxGeometry(.9,.18,.05),0x7cc4ff,-1.35,-1.95,0,{op:.9},P9);
+ const cell=dc(new T.SphereGeometry(1,14,10),0xffffff,0,0,0,{op:1}),ST=['Spermatogonium (2n): mitosis at the base of the tubule','Primary spermatocyte: meiosis I (46 duplicated chromosomes), crosses the blood-testis barrier','Secondary spermatocyte (n=23): meiosis II','Spermatid (n): spermiogenesis: acrosome + flagellum form','Spermatozoon released into the lumen (spermiation): total ~74 days'];let tt=0,t0=0;
+ fx.push(s=>{const dt=Math.min(.1,s-t0);t0=s;tt=(tt+dt)%15;const u=tt/15,st=u<.2?0:u<.45?1:u<.6?2:u<.82?3:4,r=lerp(1.12,.45,u),a=.6+u*1.2,p=R(r,a),size=[.09,.14,.1,.075,.05][st],col=[0x6fa8e8,0xe8a0d0,0xd08ae8,0x9ad0a0,0xf5f0b0][st];
+  cell.position.set(p[0],p[1],.05);cell.scale.setScalar(size*1.4);cell.material.color.setHex(col);cell.renderOrder=9;
+  txt(ST[st]+'   (day ~'+Math.round(u*74)+')')});
+ lb([['Spermatogonia',[1.2,.55,0]],['Primary spermatocyte',[-1.55,.6,0]],['Spermatid',[.15,-.9,0]],['Sperm in lumen',[0,0,0]],['Sertoli cell',[-.2,1.1,0]],['Blood-testis barrier',[1.35,-.6,0]],['Leydig cells',[-1.5,-1.4,0]],['Basement membrane',[.9,1.55,0]]],'#ffd29a');
+ return {t:'Sperm formation (spermatogenesis)',s:'Seminiferous tubule cross-section | tracer cell: base to lumen ~74 din',rd:6.5,rm:8.5,cam:[0,.05],tg:[0,0,0]}}];
+
+/* ---------- SPERM structure ---------- */
+EYX.N.sperm=['Sperm cell',c=>{
+ const {ad,tb,sp,cy,lb,txt,EG,por}=c,
+  P1=part('Acrosome','Cap of digestive enzymes (hyaluronidase, acrosin) from the Golgi: released in the ACROSOME REACTION to penetrate the corona radiata + zona pellucida.',1),
+  P2=part('Nucleus (head)','Tightly packed haploid DNA: 23 chromosomes, either X or Y (decides the baby\'s sex). Head ~5 um.',1),
+  P3=part('Neck + centriole','Connects head and tail; centrioles organise the flagellum + later the first cell divisions.',1),
+  P4=part('Midpiece (mitochondrial spiral)','Helix of mitochondria: ATP for swimming (~50 um/s).',1),
+  P5=part('Principal piece (flagellum)','Axoneme (9+2 microtubules) + fibrous sheath: whip-like beating. Defects = asthenozoospermia (poor motility).',1),
+  P6=part('End piece','Thin tip of the tail. Total length ~55 um; normal count >= 15 million/mL, >= 40% motile (WHO reference).',1);
+ EG.rotation.z=por?-1.5708:0;
+ sp(-2.5,0,0,.4,.27,.12,0xcfd8f0,P2,.95);sp(-2.45,0,0,.26,.2,.1,0x4a5a98,P2,.97);sp(-2.75,0,0,.2,.25,.13,0xf0f4ff,P1,.95);sp(-2.05,0,0,.07,.07,.07,0xe8c070,P3,.97);
+ for(let i=0;i<14;i++)ad(new T.TorusGeometry(.09,.025,6,12),0xffb060,-1.95+i*.075,0,0,{r:[0,1.5708,0],op:.97},P4);cy(-1.45,0,0,.07,1.1,0xd88a40,P4,.9,[0,0,1.5708]);
+ const seg=[];for(let i=0;i<34;i++){const m=sp(0,0,0,.07*(1-i/60),.07*(1-i/60),.07*(1-i/60),i<22?0xdfe8ff:0xbfd0ff,i<22?P5:P6,.97);seg.push(m)}
+ fx.push(s=>{seg.forEach((m,i)=>{const x=-.9+i*.1,A=.05+.12*(i/34);m.position.set(x,A*Math.sin(i*.45-s*7),0)});txt('Sperm: head (acrosome + nucleus) | neck | midpiece (energy) | tail (motor). Total ~55 um')});
+ lb([['Acrosome',[-2.95,.55,0]],['Nucleus (23 chromosomes)',[-2.3,-.6,0]],['Neck',[-2.05,.5,0]],['Midpiece',[-1.4,-.5,0]],['Principal piece',[.3,.6,0]],['End piece',[2.1,-.5,0]]],'#ffd29a');
+ return {t:'Sperm structure',s:'Head, midpiece, tail | tail ki wave live',rd:7,rm:8.5,cam:[0,.05],tg:por?[0,-.3,0]:[-.2,0,0]}}];
+
+/* ---------- PENIS: axial cross-section + erection ---------- */
+EYX.N.penis=['Penis: cross-section',c=>{
+ const {ad,tb,sp,bx,lb,txt}=c,
+  PS=part('Skin, dartos fascia + Buck fascia','Thin skin + loose dartos layer let the shaft expand; deep Buck fascia surrounds all three corpora and the deep vessels.',1),
+  PT=part('Tunica albuginea','White bilayered fibrous sheath around each corpus cavernosum: it is what makes the erect penis RIGID (and why a penile fracture is an emergency).',1),
+  PC=part('Corpora cavernosa (cavernous spaces)','Two dorsal cylinders of sponge-like tissue: trabeculae (smooth muscle + collagen) around blood-filled cavernous spaces. Relaxed trabeculae = spaces fill = erection.',1),
+  PA=part('Central (helicine) arteries','Branches of the deep penile arteries (from the internal pudendal): flow into the spaces when their smooth muscle relaxes.',1),
+  PZ=part('Corpus spongiosum + urethra','Ventral cylinder with the urethra: stays softer in erection so that semen can pass; expands into the glans at the tip.',1),
+  PV=part('Deep dorsal vein','Midline vein draining the penis; compressed between the tunica + the swollen corpora in erection (veno-occlusion), trapping blood.',1),
+  PD=part('Dorsal arteries','Paired arteries beside the deep dorsal vein: supply the glans + skin.',1),
+  PN=part('Dorsal nerves','Sensory nerves (pudendal): lateral to the dorsal arteries.',1),
+  PW=part('Superficial dorsal + circumflex veins','Drain the skin; join the saphenous vein system.',1),
+  PE=part('Erection physiology','Sexual stimulation > parasympathetic (S2-S4) nitric oxide > cGMP > smooth-muscle relaxation > arterial inflow up + venous outflow down. PDE5 inhibitors (sildenafil) keep cGMP high but still need stimulation. Sympathetic fibres cause detumescence/ejaculation.',1);
+ EYX.btn.eyer=b=>{EYX.er=!EYX.er;b.textContent=EYX.er?'Penis: erect':'Penis: flaccid';b.classList.toggle('on',EYX.er)};
+ SHP(c,ELL(0,.5,1.3,1.15,0,40),0xe8b79b,PS,.97);SHP(c,ELL(0,.5,1.2,1.05,0,40),0xf3d9c0,PS,.97);
+ const lobes=[-1,1].map(s=>{SHP(c,ELL(s*.52,.55,.62,.62,0,36),0xfff0f0,PT,.97);const g=SHP(c,ELL(s*.52,.55,.54,.54,0,36),0xe88a90,PC,.97);return g}),rn=RN(6),SPC=[];
+ [-1,1].forEach(s=>{for(let i=0;i<34;i++){const a=rn()*6.28,r=Math.sqrt(rn())*.46,x=s*.52+Math.cos(a)*r,y=.55+Math.sin(a)*r,m=ad(new T.CircleGeometry(1,10),0xb06a70,x,y,0,{s:[.045,.045,1],op:.95},PC);SPC.push({m,x,y,s0:.03+rn()*.03})}ad(new T.CircleGeometry(.05,12),0xd8232f,s*.52,.55,0,{op:1},PA)});
+ tb([[0,.1,0],[0,1.0,0]],.008,0xfff0f0,PT,.9);
+ SHP(c,ELL(0,-.3,.42,.32,0,30),0xfff0f0,PZ,.97);SHP(c,ELL(0,-.3,.36,.27,0,30),0xe8908a,PZ,.97);SHP(c,ELL(0,-.3,.12,.045,0,20),0x5a1a24,PZ,.97);
+ const dv=ad(new T.CircleGeometry(1,20),0x2f6fe0,0,1.18,.01,{s:[.1,.1,1],op:1},PV);[-1,1].forEach(s=>{ad(new T.CircleGeometry(.05,12),0xd8232f,s*.22,1.14,.01,{op:1},PD);ad(new T.CircleGeometry(.045,12),0xf2e08a,s*.4,1.1,.01,{op:1},PN);ad(new T.CircleGeometry(.04,12),0x2f6fe0,s*.95,.85,.01,{op:1},PW)});ad(new T.CircleGeometry(.04,12),0x2f6fe0,0,1.4,.01,{op:1},PW);
+ sp(1.75,-1.3,0,.1,.1,.1,0xffe36a,PE,.95);let u=0;
+ fx.push(s=>{u+=((EYX.er?1:0)-u)*.04;lobes.forEach(g=>g.scale.set(1+.1*u,1+.1*u,1));SPC.forEach(q=>{q.m.scale.set(q.s0*(1+1.2*u),q.s0*(1+1.2*u),1);q.m.material.color.setRGB(lerp(.69,.85,u),lerp(.42,.14,u),lerp(.44,.18,u))});dv.scale.set(.1*(1-.55*u),.1*(1-.7*u),1);
+  txt(EYX.er?'ERECT: cavernous spaces swell with blood, trabeculae stretch, the deep dorsal vein is squeezed (veno-occlusion)':'FLACCID: contracted smooth muscle, small spaces, veins open: blood flows through')});
+ lb([['Deep dorsal vein',[-1.1,1.55,0]],['Dorsal arteries',[1.15,1.5,0]],['Dorsal nerve',[1.5,1.15,0]],['Corpus cavernosum',[-1.45,.2,0]],['Tunica albuginea',[1.5,.1,0]],['Septum',[0,1.25,0]],['Corpus spongiosum',[-1.1,-.75,0]],['Urethra',[.85,-.7,0]]],'#ffd29a');
+ return {t:'Penis: cross-section + erection',s:'Flaccid/Erect button | image jaisa | part par tap karein',rd:5.8,rm:8.5,cam:[0,.05],tg:[0,.5,0],ex:'<button id="eyer">Penis: flaccid</button>'}}];
+
+/* ---------- PROSTATE: zones, BPH, TURP ---------- */
+EYX.N.prostate=['Prostate',c=>{
+ const {ad,tb,sp,cy,lb,txt}=c,ST=EYX.ps||0,
+  PB=part('Bladder (detrusor)','In BPH the bladder wall thickens + becomes trabeculated, and residual urine stays after voiding.',1),
+  PZ=part('Peripheral zone (~70%)','Posterior + lateral: largest zone and the site of most prostate CANCERS; felt on digital rectal examination (DRE). PSA blood test screens.',1),
+  PT=part('Transition zone (BPH)','Small zone around the urethra: it ENLARGES with age (benign prostatic hyperplasia), squeezing the urethra: weak stream, hesitancy, nocturia, retention. TURP removes this tissue.',1),
+  PC=part('Central zone','Wedge around the ejaculatory ducts.',1),
+  PA=part('Anterior fibromuscular stroma','Non-glandular smooth muscle in front.',1),
+  PU=part('Prostatic urethra','Passes straight through the gland: opens at the seminal colliculus where the ejaculatory ducts enter.',1),
+  PS=part('Seminal vesicle + ejaculatory duct','Behind the bladder; the duct pierces the prostate.',1),
+  PR=part('Rectum (DRE)','Directly behind the prostate: the examining finger feels the peripheral zone.',1),
+  PL=part('Resectoscope + wire loop (TURP)','Transurethral resection: a scope with a heated wire loop passes up the urethra and shaves away the obstructing transition zone from inside; no cut on the skin.',1);
+ EYX.btn.eyps=b=>{EYX.ps=((EYX.ps||0)+1)%3;EYX.show('prostate')};
+ const tz=[1,1.9,.55][ST],ur=[.06,.02,.11][ST];
+ sp(-.1,1.15,0,.75,.6,.4,0xd9736b,PB,.35);if(ST==1)sp(-.1,1.15,0,.7,.55,.36,0xb34f4a,PB,.5);sp(-.1,1.15,0,.55,.42,.3,0xf0a0a0,PB,.35);
+ sp(0,-.25,0,.62,.55,.4,0xd89a82,PA,.5);sp(.12,-.3,0,.44,.44,.3,0xb66c5b,PZ,.75);sp(.1,-.05,0,.2,.3,.2,0xc98a68,PC,.85);sp(-.05,.0,0,.2*tz,.22*tz,.2*tz,0xe2a080,PT,.9);
+ tb([[-.05,.6,0],[-.05,.1,0],[-.06,-.3,0],[-.1,-.7,0],[-.2,-1.25,0],[-.45,-1.7,0]],ur,0xf2e08a,PU,.97);
+ sp(.55,.5,0,.2,.45,.14,0xe3b064,PS,.9);tb([[.45,.3,0],[.2,.0,0]],.025,0xf0d9a6,PS,.95);tb([[1.0,1.2,0],[1.2,.2,0],[1.1,-.6,0],[.8,-1.2,0]],.28,0xb86a5a,PR,.8);
+ if(ST==2){tb([[-.45,-2.0,0],[-.35,-1.7,0],[-.2,-1.25,0],[-.1,-.7,0],[-.06,-.3,0]],.06,0xbfc8d8,PL,.95);ad(new T.TorusGeometry(.09,.012,6,16),0xff8a3a,-.04,-.12,0,{r:[0,1.5708,0],op:1},PL)}
+ let t=0;fx.push(s=>{txt(ST==0?'Normal prostate: urethra open, strong stream':ST==1?'BPH: transition zone swells and squeezes the urethra: weak stream, nocturia, residual urine':'TURP: resectoscope shaves away the transition zone; the channel is wide again (retrograde ejaculation is a common side effect)')});
+ lb([['Bladder',[-.9,1.5,0]],['Transition zone',[-.8,.15,0]],['Peripheral zone',[.85,-.7,0]],['Urethra',[-.75,-.8,0]],['Seminal vesicle',[1.0,.7,0]],['Rectum',[1.45,.5,0]]].concat(ST==2?[['Resectoscope',[-.9,-1.9,0]]]:[]),'#ffd29a');
+ return {t:'Prostate: zones, BPH, TURP',s:'State button: Normal > BPH > TURP | part par tap karein',rd:6.5,rm:9,cam:[0,.05],tg:[.1,0,0],ex:'<button id="eyps" class="on">State: '+['Normal','BPH','After TURP'][ST]+'</button>'}}];
+}
+/* ---- v9: sex-education awareness: hub > cycle | ipill | hiv > hivlife | mmyth | spermatogenesis ----
+   Educational content only. Facts follow WHO / standard medical references; the text always says "see a doctor" where needed. */
+{
+const {SMC,ELL,SYM,SCL,SHP}=EYX.h,lerp=(a,b,u)=>a+(b-a)*u,k01=x=>Math.max(0,Math.min(1,x));
+const MY=t=>'<span style="color:#ff8a7a;font-weight:700">MYTH</span> ',FA=t=>'<br><span style="color:#7affb0;font-weight:700">FACT</span> ';
+
+/* ---------- HUB ---------- */
+EYX.N.sexed=['Myths + facts',c=>{
+ const {lb,txt}=c,H=[['I-pill (emergency contraception)',.9,'E:ipill',0xff8a9a,'How it works, when it works + when it does NOT. Not an abortion pill.'],['HIV / AIDS',.45,'E:hiv',0xe8453a,'How it spreads, how it does NOT, prevention, U=U.'],['Masturbation: myths + hormones',0,'E:mmyth',0xb890ff,'No hair loss or weakness: the "relaxed" feeling is hormones.'],['Sperm formation',-.45,'E:sgenesis',0x6fa8e8,'Spermatogenesis in the seminiferous tubule.'],['Menstrual cycle + ovulation',-.9,'E:cycle',0xffb060,'Hormones, endometrium, fertile window.']];
+ H.forEach(h=>{const P=part(h[0],h[4],1,h[2]);c.bx(0,h[1]*1.2,0,1.7,.7,.08,h[3],P,.95)});
+ lb(H.map(h=>[h[0],[0,h[1]*1.2,.1]]),'#ffffff');txt('Sex education: sahi jankari, bina sharm ke. Card par tap > "Open inside"');
+ return {t:'Sex education: myths + facts',s:'Cards: I-pill, HIV, masturbation, sperm formation, cycle',rd:6,rm:9,cam:[0,.05],tg:[0,.0,0]}}];
+
+/* ---------- shared hormone-cycle chart ---------- */
+const CV={E2:[[1,.12],[7,.2],[10,.5],[13,1.0],[14,.7],[16,.35],[21,.55],[25,.35],[28,.12]],P4:[[1,.05],[14,.06],[16,.3],[21,1.0],[25,.45],[28,.08]],LH:[[1,.1],[11,.12],[12,.35],[13,1.0],[14,.35],[15,.12],[28,.1]],FSH:[[1,.45],[4,.55],[8,.25],[12,.3],[13,.6],[15,.2],[21,.12],[28,.35]]};
+const at=(pts,d)=>{if(d<=pts[0][0])return pts[0][1];for(let i=1;i<pts.length;i++)if(d<=pts[i][0]){const a=pts[i-1],b=pts[i],t=(d-a[0])/(b[0]-a[0]),s=t*t*(3-2*t);return a[1]+(b[1]-a[1])*s}return pts[pts.length-1][1]};
+const XD=d=>-1.5+(d-1)/27*3,YV=v=>v*1.4;
+const CHART=(c,Ps)=>{const {tb,bx,dc,lb}=c,M={},cols={E2:0xff7a9a,P4:0xb890ff,LH:0xffd24a,FSH:0x6fe0e8};
+ tb([[-1.55,0,0],[1.55,0,0]],.01,0xffffff,Ps.AX,.8);tb([[-1.55,0,0],[-1.55,1.55,0]],.01,0xffffff,Ps.AX,.8);
+ Object.keys(CV).forEach(k=>{const pts=[];for(let d=1;d<=28;d+=.5)pts.push([XD(d),YV(at(CV[k],d)),0]);M[k]=tb(pts,.022,cols[k],Ps[k],.97)});
+ [[1,5,0xb33a3a],[5,14,0xe58a9a],[14,28.4,0xf2a0a8]].forEach(a=>bx((XD(a[0])+XD(a[1]))/2,-.45,0,XD(a[1])-XD(a[0]),.12,.04,a[2],Ps.UT,.95));
+ [[1,13.5,0x6fa8e8],[13.5,14.5,0xffd24a],[14.5,28.4,0xf2c84a]].forEach(a=>bx((XD(a[0])+XD(a[1]))/2,-.25,0,XD(a[1])-XD(a[0]),.12,.04,a[2],Ps.OV,.95));
+ bx((XD(9)+XD(14.5))/2,.75,-.02,XD(14.5)-XD(9),1.5,.02,0x6fe08a,Ps.FW,.18);
+ const cur=dc(new T.BoxGeometry(.012,1.6,.02),0xffffff,0,.8,.03,{op:.95}),dots={};Object.keys(CV).forEach(k=>dots[k]=dc(new T.SphereGeometry(.045,10,8),cols[k],0,0,.04,{op:1}));
+ lb([['Day 1',[-1.5,-.7,0]],['7',[XD(7),-.7,0]],['14',[XD(14),-.7,0]],['21',[XD(21),-.7,0]],['28',[XD(28),-.7,0]],['Ovary',[-1.95,-.25,0]],['Uterus',[-1.95,-.45,0]]],'#ffffff');
+ return {set(d,show){cur.position.x=XD(d);Object.keys(dots).forEach(k=>{dots[k].position.set(XD(d),YV(at(CV[k],d)),.04);dots[k].visible=show!==false})}}};
+const CPARTS=()=>({AX:part('Axes','Cycle day (1-28) horizontal; hormone level (relative) vertical.',0),E2:part('Oestradiol (E2)','From the growing follicle: builds the endometrium (proliferative phase), peaks ~day 13 and TRIGGERS the LH surge (positive feedback). Small second rise from the corpus luteum.',1),P4:part('Progesterone','From the corpus luteum after ovulation: makes the lining secretory + stable, thick cervical mucus, raises body temperature ~0.3-0.5 C. Fall = menstruation.',1),LH:part('LH (surge)','Pituitary spike ~day 13: ovulation ~24-36 h after the surge begins (about 10-12 h after the peak). Ovulation kits detect this surge in urine.',1),FSH:part('FSH','Early cycle FSH recruits a cohort of follicles (one dominant follicle selected); inhibin B + oestradiol then lower it.',1),OV:part('Ovarian cycle bar','Follicular phase (variable length, ~13 days) > ovulation > luteal phase (fairly constant ~14 days).',1),UT:part('Uterine (endometrial) cycle bar','Menstrual (days 1-5) > proliferative (oestrogen) > secretory (progesterone). Cycle lengths of 21-35 days are normal.',1),FW:part('Fertile window','~6 days: the 5 days BEFORE ovulation + ovulation day (sperm live up to ~5 days, the egg only ~12-24 h). Ovulation happens ~14 days before the NEXT period, not always on day 14.',1)});
+
+EYX.N.cycle=['Menstrual cycle',c=>{
+ const {txt}=c,Ps=CPARTS(),ch=CHART(c,Ps);EYX.cp=true;EYX.btn.eycp=b=>{EYX.cp=!EYX.cp;b.textContent=EYX.cp?'Playing':'Paused';b.classList.toggle('on',EYX.cp)};
+ let d=1,t0=0;fx.push(s=>{const dt=Math.min(.1,s-t0);t0=s;if(EYX.cp)d=d+dt*2;if(d>=29)d=1;ch.set(d);
+  txt('Day '+Math.floor(d)+': '+(d<6?'menstruation (progesterone + oestrogen low)':d<12?'follicles grow (FSH), lining rebuilds (oestrogen)':d<15?'LH SURGE > OVULATION (fertile window ends)':d<25?'corpus luteum: progesterone high, lining secretory':'corpus luteum regresses > hormones fall > next period'))});
+ return {t:'Menstrual cycle: hormones',s:'28-din cycle | fertile window green | Play/Pause',rd:6.5,rm:9.5,cam:[0,.05],tg:[-.1,.6,0],ex:'<button id="eycp" class="on">Playing</button>'}}];
+
+/* ---------- I-PILL simulator ---------- */
+EYX.N.ipill=['I-pill: kab kaam karti hai',c=>{
+ const {tb,sp,bx,dc,lb,txt}=c,Ps=CPARTS();Ps.AX=part('Axes','Cycle day vs hormone level.',0);
+ const PI=EYX.pd||0,DAYS=[9,12,15,21],D=DAYS[PI];
+ const ST=[{ok:1,t:'Pill on day 9 (BEFORE the LH surge): works. Levonorgestrel blocks/delays the LH surge, so ovulation is postponed (the sperm die within ~5 days).'},{ok:0,t:'Pill on day 12 (LH surge already starting): usually TOO LATE: ovulation is no longer stopped. Reliability falls sharply.'},{ok:0,t:'Pill on day 15 (AFTER ovulation): the egg is already out: the pill does NOT prevent fertilisation or implantation.'},{ok:0,t:'Pill on day 21 (after implantation): it does NOT end an existing pregnancy. It is not an abortion pill.'}][PI];
+ EYX.btn.eypd=b=>{EYX.pd=((EYX.pd||0)+1)%4;EYX.show('ipill')};
+ const ch=CHART(c,Ps),cards=[['How it works','<b>Levonorgestrel 1.5 mg</b> (I-pill, Unwanted-72 etc.): mainly DELAYS OVULATION (blocks the LH surge). There is no good evidence that it stops implantation. It mostly works only if taken BEFORE ovulation.',0x6fe08a],['When it does NOT work','If ovulation has already happened or the LH surge has begun; if taken late; if vomiting within ~2-3 h (take another dose, check label); higher body weight (BMI over 30) may reduce effect; some medicines (e.g. certain anti-epileptics, rifampicin, St John\'s wort) reduce effect. It is NOT 100%.',0xe8453a],['It is NOT an abortion pill','It does not end or harm an established pregnancy and does not cause birth defects. It does not affect future fertility.',0xffb060],['Time matters','Take it as soon as possible: labels say within 72 hours (3 days); effect falls with every hour; a little effect may remain up to 5 days. Ulipristal works up to 120 h; the copper IUD (within 5 days) is the MOST effective emergency option.',0x6fa8e8],['Not for regular use + no STI protection','Emergency use only; irregular periods, nausea, spotting, headache, tiredness can follow; next period may come early or up to a week late (do a pregnancy test if more than 7 days late). It does NOT protect against HIV/STIs: use a condom, and regular contraception afterwards.',0xb890ff],['When to see a doctor','Severe lower-abdominal pain (ectopic pregnancy is rare but serious), allergy, unclear timing, rape/assault (also needs PEP + counselling), or repeated need: ask about regular contraception.',0xff8a9a]];
+ cards.forEach((q,i)=>{const P=part(q[0],q[1],1);bx(-1.2+(i%3)*1.2,-1.45-Math.floor(i/3)*.5,0,1.05,.4,.05,q[2],P,.95)});
+ const ghost=dc(new T.TubeGeometry(new T.CatmullRomCurve3(Array.from({length:40},(_,i)=>{const d=1+i*.7;return V3([XD(d),YV(at(CV.LH,d-(PI==0?5:0))*(PI==0?.35:1)+0),0])})),60,.018,6),0xffd24a,0,0,.02,{op:.45});
+ const pill=sp(XD(D),1.75,0,.07,.04,.04,0xffffff,part('Pill taken here','The cursor marks the day the pill is swallowed.',0),1),eff=dc(new T.CircleGeometry(.16,24),ST.ok?0x2fd06a:0xe8453a,XD(D),1.45,.05,{op:.95});
+ ch.set(D);let t0=0;fx.push(s=>{const w=.5+.5*Math.sin(s*4);eff.scale.setScalar(.9+.2*w);ghost.visible=PI==0;txt(ST.t+(ST.ok?'  [WORKS]':'  [DOES NOT WORK]'))});
+ lb([['LH surge',[XD(13),1.55,0]],['Ovulation',[XD(14.5),.35,0]],['Pill',[XD(D),1.95,0]],[ST.ok?'Works':'No effect',[XD(D)+.0,1.2,0]]].concat(PI==0?[['LH surge delayed',[XD(19),.6,0]]]:[]),'#ffffff');
+ return {t:'I-pill: kab kaam, kab nahi',s:'Day button: pill kis din li | cards par tap karein',rd:6.5,rm:9.5,cam:[0,.05],tg:[-.05,.1,0],ex:'<button id="eypd" class="on">Pill on day '+D+'</button>'}}];
+
+/* ---------- HIV: mucosal cross-section ---------- */
+EYX.N.hiv=['HIV / AIDS',c=>{
+ const {ad,tb,sp,bx,cy,dc,lb,txt}=c,PR=EYX.hp||0,
+  P1=part('Lumen: infected fluids','HIV is carried in blood, semen + pre-ejaculate, vaginal + rectal fluids and breast milk.',1),
+  P2=part('Epithelium (the barrier)','Intact stratified squamous skin/mucosa is a good barrier; single-layer columnar epithelium (endocervix, rectum) and micro-tears, ulcers or other STIs make entry easier.',1),
+  P3=part('Dendritic / Langerhans cell','Immune cells that sample the surface and carry virus to CD4 cells (DC-SIGN).',1),
+  P4=part('CD4 T cell (target cell)','HIV binds CD4 + CCR5/CXCR4 and destroys these helper T cells: immunity falls. Tap for the virus life cycle inside the cell.',1,'E:hivlife'),
+  P5=part('HIV virus particle (virion)','~120 nm: lipid envelope with gp120/gp41 spikes, 2 copies of RNA + reverse transcriptase, integrase, protease.',1),
+  P6=part('Lymph vessel > body','Infected cells carry virus to lymph nodes within days: the systemic infection starts.',1),
+  P7=part('HIV vs AIDS','HIV = the virus. AIDS = late stage (CD4 count below 200 cells/uL or AIDS-defining illnesses such as TB, PCP, Kaposi sarcoma). With treatment most people never reach AIDS.',1),
+  P8=part('How it does NOT spread','Hugging, handshakes, casual kissing, sharing food/utensils/toilets/swimming pools, coughs + sneezes, mosquito or other insect bites, living/working with a person with HIV. (Also not through unbroken skin.)',1),
+  P9=part('How it spreads','Unprotected vaginal or anal sex (oral: much lower risk), sharing needles/syringes, unscreened blood transfusion, and mother-to-child (pregnancy, delivery, breastfeeding) when untreated.',1),
+  PA=part('Prevention + treatment','Condoms (every time, correctly), PrEP (daily pill or injection before exposure), PEP (start within 72 h after exposure, 28 days), ART (lifelong tablets), safe needles, treating other STIs, mother-to-child programmes. U=U: sustained UNDETECTABLE viral load = cannot pass HIV sexually.',1),
+  PB=part('Testing + window period','Tests can miss a very recent infection (window period of a few weeks): test again as advised after high-risk exposure. Rapid, ELISA (4th generation) and NAT/PCR tests exist; free confidential testing (ICTC/VCT) is available in India. Everyone with HIV can live a long, healthy life with ART.',1);
+ EYX.btn.eyhp=b=>{EYX.hp=((EYX.hp||0)+1)%4;EYX.show('hiv')};
+ bx(0,1.55,0,2.8,.9,.02,0xf5f0e0,P1,.15);SHP(c,[[-1.4,.9],[1.4,.9],[1.4,.35],[-1.4,.35]],0xe8b79b,P2,.95);for(let i=0;i<5;i++)bx(0,.85-i*.1,0,2.8,.02,.02,0xc98a68,P2,.8);
+ SHP(c,[[-1.4,.35],[1.4,.35],[1.4,-.6],[-1.4,-.6]],0xf3d9c0,P3,.9);tb([[-1.4,-1.2,0],[1.4,-1.2,0]],.12,0x90e0a0,P6,.8);
+ bx(-.5,.62,0,.18,.3,.03,0x3a1a14,P2,.98);
+ sp(.9,.1,0,.14,.14,.01,0xf2c84a,P3,.97);const CD=[-.9,-.3,.4,1.0].map((x,i)=>sp(x,-.1-(i%2)*.25,0,.16,.16,.01,0x6fa8e8,P4,.97)),SH=CD.map(m=>ad(new T.TorusGeometry(.2,.015,6,20),0x2f6fe0,m.position.x,m.position.y,.01,{op:.95},P4));
+ if(PR==1){bx(0,1.0,.1,2.8,.05,.1,0xeef8ff,PA,.9)}
+ sp(1.2,1.75,0,.1,.1,.1,0xe8453a,P5,.97);
+ const V=[],nV=PR==3?2:10;for(let i=0;i<nV;i++)V.push({m:dc(new T.SphereGeometry(.06,10,8),0xe8453a,0,0,0,{op:PR==3?.35:1}),x:-1.2+i*.25,y:1.6+(i%3)*.15,st:0,t:i*.4});
+ const inf=[0,0,0,0];let t0=0;
+ fx.push(s=>{const dt=Math.min(.1,s-t0);t0=s;
+  V.forEach((v,i)=>{const stop=PR==1?1.14:.93,tear=Math.abs(v.x+.45)<.15;
+   if(v.st==0){v.y-=dt*(.25+.05*(i%3));if(v.y<=stop&&!(tear&&PR!=1)){v.y=stop;v.t+=dt;if(v.t>3.5){v.y=1.75;v.t=0}}else if(v.y<.35)v.st=1}
+   else if(v.st==1){const j=i%4,dx=CD[j].position.x-v.x,dy=CD[j].position.y-v.y,L=Math.hypot(dx,dy)||1;v.x+=dx/L*dt*.35;v.y+=dy/L*dt*.35;if(L<.2){v.st=2;if(PR!=2)inf[j]=1}}
+   else{v.y=-1.2;v.x+=dt*.4;if(v.x>1.4){v.x=-1.2+(i%4)*.1;v.y=1.75;v.st=0;v.t=0}}
+   v.m.position.set(v.x,v.y,.05)});
+  CD.forEach((m,j)=>{m.material.color.setHex(inf[j]?0xe8453a:0x6fa8e8);SH[j].visible=PR==2});
+  txt(['No protection: virions reach CD4 cells through the thin/torn epithelium and dendritic cells: infection starts','CONDOM: a physical barrier stops semen/fluids reaching the mucosa: prevents HIV + most STIs + pregnancy','PrEP: the drug in the CD4 cells (blue shield) stops the virus from establishing infection','ART / U=U: with treatment the viral load becomes undetectable: very few virions, cannot be transmitted sexually'][PR])});
+ lb([['Infected fluid',[-1.0,1.95,0]],['Epithelium',[1.1,.65,0]],['Tear / abrasion',[-.5,1.0,0]],['Dendritic cell',[.9,.3,0]],['CD4 T cell',[-.9,.1,0]],['Lymph vessel',[1.0,-1.2,0]]].concat(PR==1?[['Condom',[0,1.2,0]]]:[]),'#ffffff');
+ return {t:'HIV: how it enters, how it does not',s:'Protection button: none / condom / PrEP / ART | cell par tap = virus life cycle',rd:6.5,rm:9.5,cam:[0,.05],tg:[0,.4,0],ex:'<button id="eyhp" class="on">'+['No protection','Condom','PrEP','ART (U=U)'][PR]+'</button>'}}];
+
+/* ---------- HIV life cycle inside the CD4 T cell ---------- */
+EYX.N.hivlife=['HIV life cycle',c=>{
+ const {ad,tb,sp,dc,lb,txt}=c,
+  P1=part('1. Binding','gp120 binds CD4, then the co-receptor CCR5 (or CXCR4). Blocked by entry inhibitors (maraviroc).',1),
+  P2=part('2. Fusion + entry','gp41 pulls the envelope into the cell membrane: the capsid enters. Blocked by fusion inhibitors (enfuvirtide).',1),
+  P3=part('3. Reverse transcription','Viral reverse transcriptase copies the RNA into DNA. Blocked by NRTIs (tenofovir, lamivudine) + NNRTIs (efavirenz).',1),
+  P4=part('4. Integration','Integrase inserts the viral DNA into the host chromosome: a permanent provirus. Blocked by INSTIs (dolutegravir).',1),
+  P5=part('5. Transcription + translation','Host machinery makes viral RNA + long protein chains.',1),
+  P6=part('6. Assembly','New RNA + proteins gather under the membrane.',1),
+  P7=part('7. Budding + maturation','The virion buds out; protease cuts the long proteins so the virus matures. Blocked by protease inhibitors (darunavir).',1);
+ EYX.hl=true;EYX.btn.eyhl=b=>{EYX.hl=!EYX.hl;b.textContent=EYX.hl?'Playing':'Paused';b.classList.toggle('on',EYX.hl)};
+ SHP(c,ELL(0,0,1.45,1.3,0,48),0xb8d0f0,P1,.55);SHP(c,ELL(.1,.1,.55,.5,0,40),0x5a6aa0,P4,.9);tb([[-.35,.1,0],[.0,.0,0],[.4,.12,0]],.02,0x9fe0ff,P4,.95);
+ for(let i=0;i<14;i++){const a=2.6+i*.18;sp(Math.cos(a)*1.42,Math.sin(a)*1.27,0,.05,.05,.02,0x2f6fe0,P1,.97)}
+ const vi=sp(-2.2,.5,0,.2,.2,.1,0xe8453a,P1,.97),rna=dc(new T.TorusGeometry(.07,.015,6,16),0xffb060,0,0,0,{op:1}),dna=dc(new T.TorusGeometry(.07,.015,6,16),0x6fe0e8,0,0,0,{op:1}),nv=[0,1,2].map(()=>dc(new T.SphereGeometry(.12,12,8),0xe8453a,0,0,0,{op:1}));
+ const ST=['Binding: gp120 sticks to CD4 + CCR5','Fusion: the envelope merges with the cell, capsid enters','Reverse transcription: RNA is copied to DNA','Integration: the viral DNA enters the host chromosome (permanent)','Transcription + translation: the cell is forced to make viral parts','Assembly + budding: new virions leave; protease matures them'];let tt=0,t0=0;
+ fx.push(s=>{const dt=Math.min(.1,s-t0);t0=s;if(EYX.hl)tt=(tt+dt)%24;const p=tt,st=p<4?0:p<8?1:p<12?2:p<15?3:p<19?4:5;
+  vi.visible=p<8;vi.position.set(p<4?lerp(-2.2,-1.4,p/4):lerp(-1.4,-1.0,k01((p-4)/4)),p<4?lerp(.5,.35,p/4):.3,0);rna.visible=p>=8&&p<12;rna.position.set(lerp(-.9,-.3,k01((p-8)/4)),lerp(.25,.2,k01((p-8)/4)),0);
+  dna.visible=p>=12&&p<19;dna.position.set(p<15?lerp(-.3,.1,k01((p-12)/3)):.1,p<15?.15:.1,0);nv.forEach((m,i)=>{m.visible=p>=15;const u=k01((p-15-i*1.2)/5);m.position.set(lerp(.5,1.9,u),lerp(-.3,-.1+i*.4,u),0);m.material.opacity=p>=15?1:0});
+  txt(ST[st]+' ('+(st+1)+'/6)')});
+ lb([['HIV virion',[-2.2,.9,0]],['CD4 + CCR5',[-1.0,-.9,0]],['Nucleus',[.1,.85,0]],['Host DNA',[.1,-.7,0]],['New virions',[1.8,.75,0]]],'#ffffff');
+ return {t:'HIV life cycle in a CD4 T cell',s:'7 steps + drug classes | Play/Pause | steps par tap karein',rd:6.5,rm:9.5,cam:[0,.05],tg:[-.2,0,0],ex:'<button id="eyhl" class="on">Playing</button>'}}];
+
+/* ---------- MASTURBATION: myths + hormones ---------- */
+EYX.N.mmyth=['Masturbation: myths + hormones',c=>{
+ const {tb,sp,bx,dc,lb,txt}=c,PH=['Arousal','Plateau','Orgasm','Resolution','Refractory/relax'],
+  HC={DA:{n:'Dopamine (reward)',c:0xffd24a,v:[.2,.55,1.0,.35,.15],i:'Rises with anticipation and peaks at orgasm: the pleasure/reward signal (nucleus accumbens). Then falls: that dip is part of the "calm".'},EP:{n:'Endorphins',c:0x6fe0e8,v:[.1,.3,.8,.9,.5],i:'Natural opioids: pain relief + a relaxed, good mood after orgasm.'},OX:{n:'Oxytocin',c:0xff7a9a,v:[.15,.4,1.0,.7,.4],i:'Released from the hypothalamus/posterior pituitary at orgasm: bonding, calm, muscle relaxation.'},PL:{n:'Prolactin',c:0xb890ff,v:[.1,.1,.4,1.0,.9],i:'Rises AFTER orgasm and stays high for a while: drowsiness, satiety and the refractory period. THIS is the "tired / weak" feeling people notice: it is hormonal relaxation, not loss of strength.'},TE:{n:'Testosterone',c:0xe8453a,v:[.5,.5,.5,.5,.5],i:'Stays essentially in the normal range: ejaculation does not meaningfully lower it. (Frequent ejaculation is not linked to hair loss, weakness or low testosterone.)'}},
+  XP=i=>-1.3+i*.65;
+ const Ps={};Object.keys(HC).forEach(k=>Ps[k]=part(HC[k].n,HC[k].i,1));
+ tb([[-1.55,0,0],[1.55,0,0]],.01,0xffffff,part('Axes','Phase of the sexual response vs hormone level.',0),.8);
+ Object.keys(HC).forEach(k=>{const h=HC[k];tb(h.v.map((v,i)=>[XP(i),v*1.1,0]),.02,h.c,Ps[k],.97)});
+ sp(0,2.05,0,.55,.4,.05,0x5a6aa0,part('Brain: reward + hormone centres','Ventral tegmental area > nucleus accumbens (dopamine reward), hypothalamus (oxytocin) + pituitary (prolactin) are the same circuits that react to food, music, exercise and hugs.',1),.5);
+ const M=[['Hair loss?',MY()+'Masturbation / ejaculation causes hair loss.'+FA()+'Pattern hair loss (androgenetic alopecia) comes from GENES + hair follicles being sensitive to DHT. Ejaculation frequency does not change it. Real causes: genetics, iron/thyroid problems, stress, drugs.',0xe8453a],
+  ['Weakness / tiredness?',MY()+'It drains energy, makes the body weak and the face dull.'+FA()+'It uses about as much energy as a short walk. The relaxed, sleepy feeling = prolactin + oxytocin + endorphins (see the chart). Real weakness comes from poor sleep, diet, anaemia, depression, illness.',0xff8a5a],
+  ['"Sperm finishes"?',MY()+'Semen is limited: sperm get used up, it makes you infertile or "thin".'+FA()+'Sperm are made continuously: ~100 million or more per day in the testes (about 2.5 months to mature). Semen is mostly fluid from the seminal vesicles + prostate, replaced within hours to a day or two. Tap "Sperm formation".',0xffd24a],
+  ['Impotence / infertility?',MY()+'It causes erectile dysfunction, small penis or infertility.'+FA()+'It does not. Erectile problems come from blood-vessel disease, diabetes, smoking, drugs, anxiety. Infertility comes from sperm/egg/tube problems, not from masturbation. Penis size + height are set by genes + hormones.',0xb890ff],
+  ['Skin, eyes, memory?',MY()+'It causes pimples, weak eyesight, poor memory or exam failure.'+FA()+'No scientific evidence. Acne is hormonal (puberty); eyesight and memory depend on genes, sleep and screen/study habits.',0x6fa8e8],
+  ['Females + hymen?',MY()+'Only males do it; it "spoils virginity"; the hymen proves virginity.'+FA()+'Females masturbate too and it is normal. The hymen is a thin tissue that varies a lot and can stretch or tear in sports, tampons or by itself: it is NOT a reliable sign of anything.',0xff7a9a],
+  ['Is it normal? When to worry',FA().slice(4)+'It is a normal, common, safe part of sexual health at all ages. It becomes a concern only if it is compulsive, interferes with school/work/relationships, causes pain or injury, or causes severe guilt or distress: then talk to a doctor/counsellor. Keep it private, clean and consensual; personal, cultural and religious views differ and deserve respect.',0x6fe08a]];
+ M.forEach((q,i)=>{const P=part(q[0],q[1],1,i==2?'E:sgenesis':undefined);bx(-1.25+(i%4)*.83,-.65-Math.floor(i/4)*.5,0,.78,.4,.05,q[2],P,.95)});
+ const cur=dc(new T.BoxGeometry(.012,1.5,.02),0xffffff,0,.6,.03,{op:.9});let t0=0;fx.push(s=>{const u=(s*.25)%1,x=-1.3+u*2.6;cur.position.x=x;const i=Math.min(4,Math.floor(u*5));txt('Phase: '+PH[i]+': dopamine, endorphin, oxytocin peak at orgasm, PROLACTIN rises after: relaxation, not weakness. Testosterone stays flat.')});
+ lb(PH.map((p,i)=>[p,[XP(i),-.15,0]]).concat([['Prolactin',[1.55,1.0,0]],['Testosterone',[1.6,.6,0]]]),'#ffffff');
+ return {t:'Masturbation: myths vs facts + hormones',s:'Chart + 7 myth cards | card par tap = fact',rd:6.5,rm:9.5,cam:[0,.05],tg:[0,.7,0]}}];
+
+/* ---------- routing: male + female reproductive structures open the new nested atlas ---------- */
+{const _o5=window.openDV;EYX.old=_o5;
+ const MR=/Prostate|seminal vesicle|testis|epididymis|ductus deferens|Penis|Glans penis|tunica|scrotal|Corpus cavern|Corpus spongiosum|bulbourethral|pampiniform|Ejaculatory|testicular artery|Crus of penis|Bulb of penis/i,
+  FR=/Uterus|Cervix|Vagina|uterine tube|ovary|External female genitalia|Clitoris|pelvic fascia|ovarian ligament|round ligament|suspensory ligament|broad ligament|labium|vestibular|Vaginal vestibule/i,
+  NOT=/Pregnan|gravid|fetus|fetal|placent|amnio|umbilic/i;
+ window.openDV=(m,lv)=>{const n=m.userData.name;EYX.curM=m;if(NOT.test(n))return _o5(m,lv);
+  if(MR.test(n)){init();cur=m;EYX.st=/testis|epididymis|tunica|scrotal|pampiniform|testicular/i.test(n)?['mrepro','testis']:/Penis|Glans|Corpus|Crus|Bulb of/i.test(n)?['mrepro','penis']:/Prostate/i.test(n)?['mrepro','prostate']:['mrepro'];EYX.er=false;EYX.show(EYX.st[EYX.st.length-1]);return}
+  if(FR.test(n)){init();cur=m;EYX.st=/ovary|ovarian ligament|suspensory/i.test(n)?['frepro','ovary']:/uterine tube/i.test(n)?['frepro','tube']:/Uterus|Cervix/i.test(n)?['frepro','uterus']:['frepro'];EYX.show(EYX.st[EYX.st.length-1]);return}
+  return _o5(m,lv)}}
+}
 })();
 /* ---- CAPTION + DRAG ---- */
 let CAP=true;const DET='Detail mode: internal composition and flow relationships.',LIVE='Live: Heart 72 bpm, Lungs 15/min. Muscles ON: biceps contracts, triceps relaxes';

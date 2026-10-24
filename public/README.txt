@@ -39,3 +39,16 @@ Option B: python3 apply_jaw_brain_patch.py public/human-atlas-3d.html -> human-a
    fossa + eminence, condyle, disc (3 regions), 2 compartments, bilaminar zone, capsule, ligaments, lateral pterygoid, muscles, nerve.
    Buttons: Mouth open/closed, Disc normal/displaced (click).
 3. 11-brain-slices.js: Cerebrum/Cerebellum/Brainstem par tap = brain cross-section: Axial (2 levels), Sagittal, Coronal + MRI(T1) toggle.
+REPRO + SEX-EDUCATION PATCH v9 (male + spine + eye + jaw/brain + yeh; final html me sab included)
+
+Option A: human-atlas-3d.html ko public/ aur gh-pages dono me replace karo.
+         svg/favicon.svg -> public/favicon.svg (naya anatomy icon).
+Option B: python3 apply_repro_patch.py public/human-atlas-3d.html -> human-atlas-3d.v9.html
+
+Nodes (tree):
+ Female: frepro (Book <-> Real body morph) > uterus (3 layers + cycle phase) | ovary (follicles + ovulation) | tube (egg + sperm journey, implantation)
+ Male:   mrepro (side view, flaccid/erect, sperm path) > testis (cross-section) > sgenesis (sperm formation) > sperm | penis (cross-section + erection) | prostate (zones, BPH, TURP)
+ Awareness hub (sexed): cycle | ipill (when it works / does not) | hiv > hivlife | mmyth (masturbation myths + hormones) | sgenesis
+Routing: male/female reproductive mesh names (testis, penis, prostate, uterus, ovary, tube, cervix...) ab naye nodes kholte hain.
+SVG: favicon.svg + book-female-coronal.svg + book-male-sagittal.svg (textbook-style, labelled).
+Educational content; medical decisions ke liye doctor se milein.

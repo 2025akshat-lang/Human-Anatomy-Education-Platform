@@ -2801,6 +2801,185 @@ EYX.N.mmyth=['Masturbation: myths + hormones',c=>{
   if(FR.test(n)){init();cur=m;EYX.st=/ovary|ovarian ligament|suspensory/i.test(n)?['frepro','ovary']:/uterine tube/i.test(n)?['frepro','tube']:/Uterus|Cervix/i.test(n)?['frepro','uterus']:['frepro'];EYX.show(EYX.st[EYX.st.length-1]);return}
   return _o5(m,lv)}}
 }
+/* ---- v10 Batch 1 (audit): Library hub + individual muscles (cross-sections, abdominal wall, diaphragm, rotator cuff) ----
+   Every muscle is a selectable part with Origin / Insertion / Action / Nerve / Blood / Antagonist. */
+{
+const {ELL,SHP}=EYX.h,lerp=(a,b,u)=>a+(b-a)*u;
+EYX.LIB=EYX.LIB||[];EYX.libAdd=(title,id,col,blurb)=>{if(!EYX.LIB.some(x=>x[1]==id))EYX.LIB.push([title,id,col,blurb])};
+const F=(o,i,a,n,b,x)=>'<b>Origin</b> '+o+'<br><b>Insertion</b> '+i+'<br><b>Action</b> '+a+'<br><b>Nerve</b> '+n+'<br><b>Blood</b> '+b+(x?'<br><b>Antagonist</b> '+x:'');
+const TOP=9999;
+
+/* ---------- generic limb cross-section generator ---------- */
+const XS=(id,title,sub,cfg)=>{EYX.N[id]=[title,c=>{
+ const {ad,tb,lb,txt}=c,P0=part('Skin + fat + deep fascia','Skin, subcutaneous fat (with superficial veins + cutaneous nerves) and the deep (investing) fascia that wraps the muscles. Deep fascia sends intermuscular septa to the bone: these divide the limb into COMPARTMENTS, each with its own nerve + blood supply. Swelling inside a tight compartment = compartment syndrome (emergency, fasciotomy).',1);
+ SHP(c,ELL(0,0,cfg.rx,cfg.ry,0,48),0xe3b79b,P0,.97);SHP(c,ELL(0,0,cfg.rx*.93,cfg.ry*.93,0,48),0xf3d9c0,P0,.97);
+ cfg.mus.forEach(m=>{const P=part(m[0],m[8],1);SHP(c,ELL(m[2],m[3],m[4],m[5],m[6]||0,28),m[7],P,.96)});
+ cfg.bones.forEach(b=>{const P=part(b[3],b[4],1);SHP(c,ELL(b[0],b[1],b[2],b[2]*(b[5]||1),0,24),0xe9e2cf,P,.98);SHP(c,ELL(b[0],b[1],b[2]*.58,b[2]*.58*(b[5]||1),0,20),0xf0c9a0,P,.98)});
+ (cfg.sep||[]).forEach(s=>{const P=part(s[4],s[5],1);tb([[s[0],s[1],0],[s[2],s[3],0]],.014,0xffffff,P,.95).renderOrder=TOP-1});
+ cfg.nv.forEach(n=>{const P=part(n[0],n[4],1),col=n[3]=='a'?0xd8232f:n[3]=='v'?0x2f6fe0:0xf2e08a;ad(new T.CircleGeometry(n[5]||.06,14),col,n[1],n[2],.01,{op:1},P).renderOrder=TOP});
+ lb(cfg.mus.map(m=>[m[1],[m[2],m[3],0]]).concat(cfg.bones.map(b=>[b[3].split(' ')[0],[b[0],b[1],0]])),'#ffffff');
+ txt(cfg.note+' | cross-section seen from below, anterior at the TOP, lateral on the RIGHT');
+ return {t:title,s:sub,rd:5.5,rm:cfg.rm||8.5,cam:[0,.05],tg:[0,0,0]}}];EYX.libAdd(title,id,cfg.col||0xc0504a,sub)};
+
+/* ARM */
+XS('arm','Arm: mid-arm cross-section','Biceps, brachialis, triceps + neurovascular bundle',{rx:1.3,ry:1.15,rm:8,col:0xc0504a,note:'Anterior compartment = flexors (musculocutaneous); posterior = extensors (radial)',
+ bones:[[0,0,.3,'Humerus','Shaft of the humerus: the radial nerve winds in the spiral groove on its back (fracture here = wrist drop).']],
+ mus:[['Biceps brachii','Bi',0,.62,.42,.27,0,0xc0504a,F('Short head: coracoid process; long head: supraglenoid tubercle','Radial tuberosity + bicipital aponeurosis','Flexes elbow, SUPINATES forearm, weak shoulder flexion','Musculocutaneous (C5-C6)','Brachial artery','Triceps')],
+  ['Brachialis','Br',0,.26,.4,.13,0,0xb04a44,F('Distal half of anterior humerus','Ulnar tuberosity + coronoid process','Main elbow flexor ("workhorse")','Musculocutaneous (+ radial)','Brachial + radial recurrent arteries','Triceps')],
+  ['Triceps: long head','TL',-.32,-.62,.36,.22,.2,0xd9803a,F('Infraglenoid tubercle of the scapula','Olecranon (common tendon)','Extends elbow; long head extends + adducts the shoulder','Radial (C6-C8)','Profunda brachii artery','Biceps + brachialis')],
+  ['Triceps: lateral head','TLa',.46,-.5,.3,.2,-.2,0xd9803a,F('Posterior humerus above the radial groove','Olecranon','Extends elbow','Radial','Profunda brachii','Biceps + brachialis')],
+  ['Triceps: medial head','TM',0,-.3,.34,.12,0,0xc9702a,F('Posterior humerus below the radial groove','Olecranon','Extends elbow (deep, always active)','Radial','Profunda brachii','Biceps + brachialis')]],
+ nv:[['Brachial artery',-.45,.22,'a','Main artery of the arm; pulse felt medially. Brachial vein pair beside it.'],['Brachial veins',-.56,.31,'v','Deep veins (venae comitantes) beside the artery.'],['Median nerve',-.35,.32,'n','Runs with the brachial artery; supplies the forearm flexors + thenar muscles.'],['Ulnar nerve',-.64,-.06,'n','Passes behind the medial epicondyle ("funny bone"): vulnerable there.'],['Radial nerve',.36,-.14,'n','Spiral groove of the humerus; supplies the triceps then ALL extensors of the forearm.'],['Musculocutaneous nerve',.14,.42,'n','Between biceps + brachialis: supplies both + becomes the lateral cutaneous nerve of the forearm.'],['Basilic vein',-.86,.32,'v','Superficial vein on the medial side; joins the brachial veins.'],['Cephalic vein',.78,.5,'v','Superficial vein on the lateral side; drains into the axillary vein.']],
+ sep:[[.3,.06,.95,.02,'Lateral intermuscular septum','Separates the anterior (flexor) from the posterior (extensor) compartment on the lateral side.'],[-.3,.05,-.96,.04,'Medial intermuscular septum','Medial partition between the two compartments; the ulnar nerve pierces it.']]});
+
+/* FOREARM */
+XS('forearm','Forearm: proximal third','Flexor + extensor compartments, 14 muscles',{rx:1.25,ry:1.0,rm:8,col:0xd9803a,note:'Anterior = flexors/pronators (median + ulnar); posterior = extensors/supinator (radial)',
+ bones:[[.42,0,.17,'Radius','Lateral bone of the forearm: rotates around the ulna in pronation/supination.'],[-.42,-.02,.19,'Ulna','Medial, stable bone of the elbow joint.']],
+ mus:[['Pronator teres','PT',.55,.46,.2,.13,.35,0xc0504a,F('Medial epicondyle + coronoid process','Middle lateral radius','PRONATES the forearm, weak elbow flexion','Median','Ulnar + radial arteries','Supinator, biceps')],
+  ['Flexor carpi radialis','FCR',.2,.6,.16,.11,0,0xb04a44,F('Medial epicondyle (common flexor origin)','Base of metacarpals 2 + 3','Flexes + abducts the wrist','Median','Radial artery','Extensor carpi radialis')],
+  ['Palmaris longus','PL',-.05,.64,.1,.08,0,0xc9702a,F('Medial epicondyle','Palmar aponeurosis','Weak wrist flexor, tenses the palmar fascia (absent in ~15% of people)','Median','Ulnar artery','')],
+  ['Flexor digitorum superficialis','FDS',-.2,.4,.3,.15,0,0xd9803a,F('Medial epicondyle, coronoid, radius','Middle phalanges of fingers 2-5','Flexes PIP joints (+ MCP + wrist)','Median','Ulnar artery','Extensor digitorum')],
+  ['Flexor carpi ulnaris','FCU',-.62,.36,.18,.14,.3,0xb04a44,F('Medial epicondyle + olecranon','Pisiform, hamate, 5th metacarpal','Flexes + adducts the wrist','Ulnar','Ulnar artery','Extensor carpi ulnaris')],
+  ['Flexor digitorum profundus','FDP',-.5,.05,.28,.16,0,0xc9702a,F('Proximal 3/4 of the ulna + interosseous membrane','Distal phalanges of fingers 2-5','Flexes DIP joints (only muscle that does)','Median (index, middle) + ulnar (ring, little)','Ulnar + anterior interosseous arteries','Extensor digitorum')],
+  ['Flexor pollicis longus','FPL',.32,.2,.15,.1,.2,0xb04a44,F('Anterior radius + interosseous membrane','Distal phalanx of the thumb','Flexes the thumb IP joint','Anterior interosseous (median)','Anterior interosseous artery','Extensor pollicis')],
+  ['Brachioradialis','BR',.86,.26,.13,.2,.2,0xd98a5a,F('Lateral supracondylar ridge of the humerus','Styloid process of the radius','Flexes the elbow (strongest in mid-pronation); radial-nerve flexor','Radial','Radial recurrent artery','Triceps')],
+  ['Extensor carpi radialis longus','ECRL',.88,-.06,.13,.13,0,0xe0a060,F('Lateral supracondylar ridge','Base of the 2nd metacarpal','Extends + abducts the wrist','Radial','Radial recurrent artery','Flexor carpi radialis')],
+  ['Extensor carpi radialis brevis','ECRB',.72,-.26,.14,.11,0,0xe0a060,F('Lateral epicondyle (common extensor origin)','Base of the 3rd metacarpal','Extends the wrist ("tennis elbow" tendon)','Posterior interosseous (radial)','Radial recurrent artery','Flexor carpi radialis')],
+  ['Extensor digitorum','ED',.15,-.56,.3,.12,0,0xd9a060,F('Lateral epicondyle','Extensor expansions of fingers 2-5','Extends fingers + wrist','Posterior interosseous (radial)','Posterior interosseous artery','Flexor digitorum')],
+  ['Extensor digiti minimi','EDM',-.2,-.62,.1,.08,0,0xd9a060,F('Lateral epicondyle','Extensor expansion of the little finger','Extends the little finger','Posterior interosseous','Posterior interosseous artery','')],
+  ['Extensor carpi ulnaris','ECU',-.58,-.44,.15,.12,0,0xd9a060,F('Lateral epicondyle + posterior ulna','Base of the 5th metacarpal','Extends + adducts the wrist','Posterior interosseous','Posterior interosseous artery','Flexor carpi ulnaris')],
+  ['Supinator','Sup',.55,-.08,.13,.1,0,0xc9702a,F('Lateral epicondyle, supinator crest of ulna','Proximal radius (wraps around it)','SUPINATES the forearm','Posterior interosseous nerve (pierces it)','Recurrent interosseous artery','Pronator teres')]],
+ nv:[['Median nerve',-.06,.26,'n','Between FDS + FDP: supplies most forearm flexors + the thenar muscles. Carpal tunnel syndrome at the wrist.'],['Ulnar nerve + artery',-.5,.24,'n','Deep to FCU: supplies FCU + medial half of FDP + hand intrinsics.'],['Radial artery',.46,.38,'a','Under brachioradialis: the pulse point at the wrist.'],['Superficial radial nerve',.72,.34,'n','Sensory branch under brachioradialis: dorsum of the hand + thumb.'],['Posterior interosseous nerve',.45,-.17,'n','Pierces supinator: supplies all the posterior-compartment muscles.']],
+ sep:[[.05,0,-.05,.02,'Interosseous membrane','Fibrous sheet between radius + ulna: transmits force from the hand to the ulna and gives muscle attachment.']]});
+
+/* THIGH */
+XS('thigh','Thigh: mid-thigh cross-section','Quadriceps, adductors, hamstrings + sciatic nerve',{rx:1.6,ry:1.45,rm:11,col:0xc0504a,note:'Anterior (femoral n.), medial (obturator n.), posterior (sciatic n.) compartments',
+ bones:[[0,0,.38,'Femur','Longest + strongest bone; linea aspera on the back gives attachment to the adductors + vasti.']],
+ mus:[['Rectus femoris','RF',.05,.78,.3,.2,0,0xc0504a,F('AIIS + above the acetabulum','Patella > tibial tuberosity (quadriceps tendon)','Extends the knee + FLEXES the hip (biarticular)','Femoral (L2-L4)','Femoral artery (lateral circumflex branches)','Hamstrings')],
+  ['Vastus lateralis','VL',.72,.4,.3,.4,.3,0xb04a44,F('Greater trochanter + lateral lip of linea aspera','Patella > tibial tuberosity','Extends the knee (largest quadriceps head)','Femoral','Lateral circumflex femoral artery','Hamstrings')],
+  ['Vastus medialis','VM',-.55,.42,.3,.35,-.3,0xb04a44,F('Intertrochanteric line + medial lip of linea aspera','Patella > tibial tuberosity','Extends the knee; the lower fibres (VMO) stabilise the patella','Femoral','Femoral artery','Hamstrings')],
+  ['Vastus intermedius','VI',.05,.4,.32,.14,0,0xc9702a,F('Anterior + lateral femoral shaft','Patella > tibial tuberosity','Extends the knee (deep)','Femoral','Lateral circumflex femoral artery','Hamstrings')],
+  ['Sartorius','Sa',-.35,.95,.18,.09,0,0xd9803a,F('ASIS','Medial proximal tibia (pes anserinus)','Flexes, abducts + laterally rotates the hip; flexes the knee ("tailor\'s muscle", longest muscle)','Femoral','Femoral artery','')],
+  ['Adductor longus','AL',-.78,.2,.2,.17,.2,0xd9a060,F('Body of the pubis','Middle third of linea aspera','Adducts + flexes the thigh','Obturator (L2-L4)','Profunda femoris','Abductors (gluteus medius)')],
+  ['Adductor magnus','AM',-.4,-.3,.45,.3,0,0xe0a060,F('Ischiopubic ramus + ischial tuberosity','Linea aspera + adductor tubercle','Adducts the thigh (hamstring part extends the hip)','Obturator + sciatic (tibial part)','Profunda femoris + perforators','Gluteus medius')],
+  ['Gracilis','Gr',-.98,-.1,.1,.2,0,0xd98a5a,F('Inferior pubic ramus','Medial tibia (pes anserinus)','Adducts the thigh, flexes the knee','Obturator','Profunda femoris','')],
+  ['Biceps femoris','BF',.5,-.5,.28,.22,-.2,0xd9803a,F('Long head: ischial tuberosity; short head: linea aspera','Fibular head','Flexes the knee, extends the hip (long head), laterally rotates the flexed knee','Sciatic (tibial: long head; common fibular: short head)','Perforating branches of profunda femoris','Quadriceps')],
+  ['Semitendinosus','ST',-.02,-.68,.2,.13,0,0xd98a5a,F('Ischial tuberosity','Medial tibia (pes anserinus)','Flexes the knee, extends the hip, medially rotates','Sciatic (tibial part)','Perforating branches of profunda femoris','Quadriceps')],
+  ['Semimembranosus','SM',-.3,-.5,.22,.2,0,0xe0a060,F('Ischial tuberosity','Posterior medial tibial condyle','Flexes the knee, extends the hip, medially rotates','Sciatic (tibial part)','Perforating branches of profunda femoris','Quadriceps')]],
+ nv:[['Femoral artery',-.42,.62,'a','In the adductor (Hunter) canal under sartorius at mid-thigh; becomes the popliteal artery after the adductor hiatus.'],['Femoral vein',-.55,.55,'v','Lies behind + medial to the artery at this level.'],['Saphenous nerve',-.3,.6,'n','Sensory branch of the femoral nerve to the medial leg + foot.'],['Sciatic nerve',.14,-.4,'n','Largest nerve (up to 2 cm): tibial + common fibular parts, between biceps femoris and the adductor magnus.'],['Great saphenous vein',-1.05,.4,'v','Longest superficial vein, medial side; used for bypass grafts.'],['Profunda femoris artery',-.2,.05,'a','Deep artery of the thigh: main supply of the thigh muscles.']]});
+
+/* LEG */
+XS('leg','Leg: mid-calf cross-section','4 compartments: anterior, lateral, superficial + deep posterior',{rx:1.2,ry:1.05,rm:8.5,col:0xd9803a,note:'4 compartments: anterior (deep fibular), lateral (superficial fibular), 2 posterior (tibial)',
+ bones:[[-.36,.2,.31,'Tibia','Weight-bearing bone: the subcutaneous medial surface (shin) has no muscle cover.'],[.64,.06,.16,'Fibula','Lateral bone: attachment for muscles; does not bear weight (ankle stability).']],
+ mus:[['Tibialis anterior','TA',-.02,.62,.2,.26,0,0xc0504a,F('Lateral tibial condyle + upper 2/3 of the lateral tibia, interosseous membrane','Medial cuneiform + base of the 1st metatarsal','DORSIFLEXION + inversion','Deep fibular (L4-L5)','Anterior tibial artery','Gastrocnemius + soleus')],
+  ['Extensor digitorum longus','EDL',.36,.56,.18,.22,0,0xb04a44,F('Lateral tibial condyle, fibula, interosseous membrane','Middle + distal phalanges of toes 2-5','Extends toes 2-5, dorsiflexion','Deep fibular','Anterior tibial artery','Flexor digitorum longus')],
+  ['Extensor hallucis longus','EHL',.2,.32,.1,.13,0,0xc9702a,F('Middle fibula + interosseous membrane','Distal phalanx of the great toe','Extends the big toe, dorsiflexion','Deep fibular','Anterior tibial artery','Flexor hallucis longus')],
+  ['Fibularis longus','FL',.8,.28,.14,.24,.1,0xd9a060,F('Head + upper 2/3 of the fibula','Medial cuneiform + base of the 1st metatarsal','EVERTS the foot + plantarflexes, supports the transverse arch','Superficial fibular (L5-S1)','Fibular artery','Tibialis anterior / posterior')],
+  ['Fibularis brevis','FB',.76,.02,.1,.14,0,0xe0a060,F('Lower 2/3 of the lateral fibula','Tuberosity of the 5th metatarsal','Everts the foot','Superficial fibular','Fibular artery','Tibialis anterior / posterior')],
+  ['Gastrocnemius (medial head)','GM',-.34,-.55,.34,.27,0,0xc0504a,F('Medial condyle of the femur','Calcaneus via the Achilles tendon','Plantarflexion + knee flexion','Tibial (S1-S2)','Sural arteries (popliteal)','Tibialis anterior')],
+  ['Gastrocnemius (lateral head)','GL',.3,-.58,.28,.25,0,0xb04a44,F('Lateral condyle of the femur','Calcaneus via the Achilles tendon','Plantarflexion + knee flexion','Tibial (S1-S2)','Sural arteries (popliteal)','Tibialis anterior')],
+  ['Soleus','So',0,-.22,.5,.17,0,0xd9803a,F('Head + upper fibula, soleal line of the tibia','Calcaneus via the Achilles tendon','Plantarflexion; postural muscle + "peripheral heart" (venous pump)','Tibial (S1-S2)','Posterior tibial + fibular arteries','Tibialis anterior')],
+  ['Tibialis posterior','TP',-.02,.0,.16,.13,0,0xc9702a,F('Interosseous membrane + posterior tibia + fibula','Navicular tuberosity (+ cuneiforms, cuboid, metatarsals 2-4)','INVERSION + plantarflexion, supports the medial arch','Tibial (L4-L5)','Posterior tibial artery','Fibularis longus + brevis')],
+  ['Flexor digitorum longus','FDL',-.36,-.06,.14,.12,0,0xd9a060,F('Posterior tibia','Distal phalanges of toes 2-5','Flexes toes 2-5, plantarflexion','Tibial','Posterior tibial artery','Extensor digitorum longus')],
+  ['Flexor hallucis longus','FHL',.34,-.08,.16,.13,0,0xd9a060,F('Posterior fibula','Distal phalanx of the great toe','Flexes the big toe (push-off)','Tibial','Fibular artery','Extensor hallucis longus')]],
+ nv:[['Anterior tibial artery + deep fibular nerve',.12,.3,'a','Lie on the interosseous membrane in the anterior compartment.'],['Superficial fibular nerve',.72,.46,'n','Runs between the lateral compartment muscles: supplies them and the dorsum of the foot skin.'],['Posterior tibial vessels + tibial nerve',-.06,-.06,'a','Between the soleus + deep posterior muscles: pulse behind the medial malleolus.'],['Fibular artery',.46,-.12,'a','Hugs the fibula; supplies the lateral + posterior compartments.'],['Great saphenous vein',-.86,.1,'v','Medial superficial vein beside the saphenous nerve.'],['Small saphenous vein',0,-.92,'v','Posterior superficial vein with the sural nerve.']],
+ sep:[[.1,.22,.6,.12,'Interosseous membrane','Between tibia + fibula: separates the anterior from the deep posterior compartment.']]});
+
+/* ---------- ABDOMINAL WALL layers ---------- */
+EYX.N.abdwall=['Abdominal wall layers',c=>{
+ const {ad,tb,bx,lb,txt}=c,AB=EYX.ab||0,
+  P1=part('Skin + Camper fat + Scarpa fascia','Skin; Camper = fatty layer; Scarpa = membranous layer (continues into the perineum: urine from a ruptured urethra spreads along it).',1),
+  P2=part('External oblique','Outermost muscle: fibres run "hands in pockets" (down + medially). Aponeurosis forms the inguinal ligament.',1),
+  P3=part('Internal oblique','Middle layer: fibres run up + medially (perpendicular to the external oblique). Forms the cremaster in males.',1),
+  P4=part('Transversus abdominis','Deepest muscle: fibres run transversely; compresses the abdomen (corset). Nerves + vessels run in the plane between it and the internal oblique (TAP block).',1),
+  P5=part('Rectus abdominis + sheath','Paired vertical "six-pack" muscles with 3 tendinous intersections, enclosed in the rectus sheath. Flexes the trunk, tenses the wall. Nerve: T7-T12. Blood: superior + inferior epigastric arteries.',1),
+  P6=part('Rectus sheath: anterior lamina','Always formed by the external oblique aponeurosis (+ half of the internal oblique).',1),
+  P7=part('Rectus sheath: posterior lamina (above the arcuate line)','Above the arcuate line: posterior internal oblique + transversus aponeurosis pass BEHIND the rectus. Below it everything passes in FRONT, so only transversalis fascia lies behind.',1),
+  P8=part('Linea alba + linea semilunaris','Linea alba: midline fibrous raphe (umbilical hernia site). Linea semilunaris: lateral edge of the rectus (Spigelian hernia).',1),
+  P9=part('Transversalis fascia, extraperitoneal fat, parietal peritoneum','Innermost layers: fascia + fat + the serous lining of the abdominal cavity.',1),
+  PA=part('Inferior epigastric artery','Runs behind the rectus (above the arcuate line sits in the sheath); medial border of the deep inguinal ring (Hesselbach). Anastomoses with the superior epigastric (from the internal thoracic).',1),
+  PB=part('Segmental nerves (T7-L1) in the TAP plane','Thoracoabdominal, subcostal, iliohypogastric + ilioinguinal nerves run between the internal oblique and transversus: supply wall muscles + skin.',1);
+ EYX.btn.eyab=b=>{EYX.ab=1-(EYX.ab||0);EYX.show('abdwall')};
+ const R={skin:2.45,sc:2.37,eo:2.28,io:2.2,ta:2.12,tf:2.06,fat:2.02,per:1.98},pt=(r,a)=>[r*Math.cos(a*Math.PI/180),-1+r*Math.sin(a*Math.PI/180),0],arc=(r,a0,a1)=>{const p=[];for(let i=0;i<=10;i++)p.push(pt(r,a0+(a1-a0)*i/10));return p};
+ tb(arc(R.skin,90,28),.04,0xe3b79b,P1,.97);tb(arc(R.sc,90,28),.03,0xf3d9c0,P1,.97);
+ tb(arc(R.eo,62,28),.075,0xc0504a,P2,.97);tb(arc(R.io,62,28),.075,0xd9803a,P3,.97);tb(arc(R.ta,62,28),.07,0xe0a060,P4,.97);
+ tb(arc(R.eo,90,62),.02,0xf5ecd0,P6,.97);tb(arc(R.io,90,62),.02,AB?0xf5ecd0:0xf5ecd0,P6,.9);
+ if(!AB){tb(arc(R.ta,90,62),.02,0xf5ecd0,P7,.97);tb(arc(R.io-.04,90,62),.018,0xf5ecd0,P7,.97)}else{tb(arc(R.eo+.05,90,62),.02,0xf5ecd0,P6,.97);tb(arc(R.io+.06,90,62),.02,0xf5ecd0,P6,.97)}
+ const rc=pt(2.24,76);SHP(c,ELL(rc[0],rc[1],.42,.15,.2,24),0xd8232f,P5,.96);
+ ad(new T.BoxGeometry(.04,.5,.05),0xfff6dc,0,-1+2.2,0,{op:1},P8);tb([pt(2.1,62),pt(2.3,62)],.02,0xfff6dc,P8,1);
+ tb(arc(R.tf,90,28),.02,0xbfd0ff,P9,.95);tb(arc(R.fat,90,28),.04,0xf2d070,P9,.9);tb(arc(R.per,90,28),.015,0xff9fbf,P9,.97);
+ const ea=pt(AB?R.tf-.02:R.ta-.02,78);sp2(c,ea,.05,0xd8232f,PA);const nv=pt(2.16,45);sp2(c,nv,.05,0xf2e08a,PB);
+ function sp2(c,p,r,col,P){c.sp(p[0],p[1],0,r,r,r,col,P,1)}
+ lb([['Skin',[1.45,1.65,0]],['Ext. oblique',[2.1,.55,0]],['Int. oblique',[2.3,.2,0]],['Transversus',[2.35,-.1,0]],['Rectus',[.55,1.45,0]],['Linea alba',[0,1.6,0]],['Peritoneum',[1.1,.55,0]],['TAP plane',[1.85,.05,0]]],'#ffffff');
+ txt(AB?'BELOW the arcuate line: all 3 aponeuroses pass IN FRONT of the rectus; only transversalis fascia behind':'ABOVE the arcuate line: the sheath splits around the rectus (anterior + posterior laminae)');
+ return {t:'Abdominal wall: layers + rectus sheath',s:'Arcuate line button | skin to peritoneum',rd:6,rm:9,cam:[0,.05],tg:[1.0,.6,0],ex:'<button id="eyab" class="on">'+(AB?'Below arcuate line':'Above arcuate line')+'</button>'}}];EYX.libAdd('Abdominal wall layers','abdwall',0xc0504a,'Muscle layers, rectus sheath, TAP plane');
+
+/* ---------- DIAPHRAGM from below ---------- */
+EYX.N.diaph=['Diaphragm',c=>{
+ const {ad,tb,sp,cy,lb,txt}=c,
+  P1=part('Central tendon','Trefoil (3-leaflet) aponeurosis in the middle of the dome: fused with the pericardium above. Fibres converge on it.',1),
+  P2=part('Sternal part','Two slips from the xiphoid process (anterior): smallest part.',1),
+  P3=part('Costal part','Muscle slips from the inner surface of ribs 7-12 (lower 6 costal cartilages): the largest part, forms the dome sides.',1),
+  P4=part('Lumbar part: right + left crura','Right crus (L1-L3) + left crus (L1-L2) from the lumbar vertebrae + arcuate ligaments; the right crus splits around the oesophagus (a "pinchcock").',1),
+  P5=part('Caval opening (T8)','IVC + right phrenic nerve branches. In the central tendon: widens on inspiration, drawing blood up to the heart.',1),
+  P6=part('Oesophageal opening (T10)','Oesophagus + anterior/posterior vagal trunks + oesophageal branches of the left gastric vessels. Sliding hiatus hernia happens here.',1),
+  P7=part('Aortic opening (T12)','Behind the median arcuate ligament: aorta + thoracic duct + azygos vein. Not a true opening of the muscle (so the aorta is not squeezed by contraction).',1),
+  P8=part('Median arcuate ligament','Fibrous arch joining the two crura in front of the aorta (coeliac trunk arises just below it: compression = median arcuate ligament syndrome).',1),
+  P9=part('Phrenic nerve (C3-C5)','Sole MOTOR supply of the diaphragm (+ sensation of the central part, referred to the shoulder tip). "C3, 4, 5 keep the diaphragm alive".',1),
+  PA=part('Mnemonic: "I 8 10 EGGS AT 12"','IVC at T8, oEsophagus at T10, Aorta (+ thoracic duct + azygos) at T12.',1);
+ EYX.ins=false;EYX.btn.eyin=b=>{EYX.ins=!EYX.ins;b.textContent=EYX.ins?'Inspiration':'Expiration';b.classList.toggle('on',EYX.ins)};
+ const ring=Array.from({length:37},(_,i)=>{const a=i/36*6.2832;return [Math.cos(a)*1.55,Math.sin(a)*1.25,0]});
+ const dome=new T.Group();c.EG.add(dome);
+ SHP(c,ELL(0,0,1.5,1.2,0,48),0xc0504a,P3,.9);SHP(c,[[-.05,.95],[-.5,.9],[-.95,.45],[-.9,.05],[-.55,-.15],[-.1,-.1],[.35,-.05],[.9,.05],[.95,.45],[.5,.9]],0xf5ecd0,P1,.97,true);
+ [-1,1].forEach(s=>{tb([[s*.2,1.1,0],[s*.0,1.0,0]],.1,0xc0504a,P2,.95)});tb([[0,.98,0],[0,1.2,0]],.1,0xc0504a,P2,.95);
+ SHP(c,ELL(.28,-.95,.2,.4,.1,24),0xb04a44,P4,.97);SHP(c,ELL(-.25,-.95,.16,.36,-.1,24),0xb04a44,P4,.97);
+ const cav=SHP(c,ELL(.45,.3,.15,.15,0,22),0x2f6fe0,P5,1);SHP(c,ELL(-.08,-.5,.12,.1,0,22),0xf2c070,P6,1);SHP(c,ELL(0,-.9,.12,.12,0,22),0xd8232f,P7,1);
+ tb([[-.3,-.78,0],[0,-.7,0],[.3,-.78,0]],.025,0xfff6dc,P8,.97);[-1,1].forEach(s=>tb([[s*.95,.25,0],[s*.7,.1,0],[s*.5,.2,0]],.02,0xf2e08a,P9,.97));
+ sp(1.6,-.2,0,.001,.001,.001,0xffffff,PA,.01);ad(new T.BoxGeometry(.5,.12,.05),0xffe36a,-1.3,-1.4,0,{op:.95},PA);
+ [...c.EG.children].forEach(m=>{if(m!==dome){c.EG.remove(m);dome.add(m)}});let vv=0;fx.push(s=>{vv+=((EYX.ins?1:0)-vv)*.06;dome.scale.set(1+.06*vv,1+.06*vv,1);const k=1+.3*vv;cav.scale.set(k,k,1);cav.position.set(-(k-1)*.45,-(k-1)*.3,0);txt(EYX.ins?'INSPIRATION: the dome flattens + descends (C3-C5), thoracic volume up, pressure down, air in; the caval opening widens':'EXPIRATION: the diaphragm relaxes + rises (elastic recoil of the lungs)')});
+ lb([['Central tendon',[0,.35,0]],['Costal part',[1.2,-.45,0]],['Sternal part',[0,1.4,0]],['R crus',[.55,-1.4,0]],['L crus',[-.7,-1.35,0]],['IVC T8',[.9,.55,0]],['Oesophagus T10',[-.6,-.45,0]],['Aorta T12',[.5,-.95,0]],['Phrenic n.',[-1.35,.5,0]]],'#ffffff');
+ return {t:'Diaphragm (seen from below)',s:'3 openings: T8 / T10 / T12 | Inspiration button',rd:6,rm:9,cam:[0,.05],tg:[0,0,0],ex:'<button id="eyin">Expiration</button>'}}];EYX.libAdd('Diaphragm','diaph',0xc0504a,'Parts, 3 openings T8/T10/T12, phrenic nerve');
+
+/* ---------- ROTATOR CUFF (posterior view, abduction) ---------- */
+EYX.N.rcuff=['Rotator cuff',c=>{
+ const {ad,tb,sp,lb,txt,EG}=c,
+  P1=part('Supraspinatus','O: supraspinous fossa. I: top of the greater tubercle. A: initiates ABDUCTION (first 15 degrees) + holds the head in the glenoid. N: suprascapular (C5-C6). B: suprascapular artery. Most commonly torn cuff tendon (passes under the acromion).',1),
+  P2=part('Infraspinatus','O: infraspinous fossa. I: middle facet of the greater tubercle. A: LATERAL (external) rotation. N: suprascapular (C5-C6). B: suprascapular + circumflex scapular arteries.',1),
+  P3=part('Teres minor','O: upper lateral border of the scapula. I: lowest facet of the greater tubercle. A: lateral rotation + adduction. N: AXILLARY (C5-C6). B: circumflex scapular artery.',1),
+  P4=part('Subscapularis (anterior surface)','O: subscapular fossa (front of the scapula). I: lesser tubercle. A: MEDIAL (internal) rotation. N: upper + lower subscapular (C5-C7). B: subscapular artery. Largest + strongest cuff muscle. (Seen when you press "Front view".)',1),
+  P5=part('Glenoid + labrum','Shallow glenoid socket (only ~1/3 of the head covered) deepened by the fibrocartilage glenoid LABRUM. SLAP + Bankart lesions = labral tears; anterior dislocation is most common.',1),
+  P6=part('Humeral head + greater/lesser tubercle','Head (~1/3 sphere) + greater tubercle (3 cuff tendons) + lesser tubercle (subscapularis) separated by the bicipital groove.',1),
+  P7=part('Joint capsule','Loose capsule (needed for the range of motion): reinforced by the cuff tendons + glenohumeral ligaments; weak inferiorly.',1),
+  P8=part('Subacromial bursa','Slippery bursa between the supraspinatus + the acromion: inflamed in impingement ("painful arc" 60-120 degrees of abduction).',1),
+  P9=part('Acromion + coracoacromial arch','Acromion, coracoid process + the coracoacromial ligament roof the joint (a second "joint": narrow space where the supraspinatus runs).',1),
+  PA=part('Long head of biceps tendon','Arises from the supraglenoid tubercle + labrum, runs over the head in the bicipital groove.',1);
+ EYX.abd=false;EYX.btn.eyab2=b=>{EYX.abd=!EYX.abd;b.textContent=EYX.abd?'Arm: abducted':'Arm: at side';b.classList.toggle('on',EYX.abd)};EYX.btn.eyfv=b=>{EYX.fv=!EYX.fv;b.textContent=EYX.fv?'View: front':'View: back';tth=EYX.fv?3.1416:0};
+ SHP(c,[[-1.6,1.1],[-.4,1.15],[.0,.9],[.25,.55],[.25,-.1],[0,-.3],[-.3,-.9],[-.9,-1.3],[-1.5,-.6],[-1.7,.2]],0xe9e2cf,P5,.92,true);tb([[-1.1,.55,0],[.35,.62,0],[.55,.78,0]],.05,0xe9e2cf,P9,.97);
+ const SP=ad(new T.PlaneGeometry(.9,.12),0xcfc6a8,-.6,.35,.03,{op:.95},P5);
+ ad(new T.SphereGeometry(1,16,12),0xe9e2cf,.82,.7,.02,{s:[.34,.5,.1],op:.95,r:[0,0,-.5]},P9);tb([[.42,.62,.05],[.7,.85,.06]],.02,0xfff6dc,P9,.95);
+ SHP(c,ELL(.15,.0,.15,.24,0,24),0x9fd7e2,P5,.95);ad(new T.TorusGeometry(.2,.03,8,24),0xcfe8f0,.15,0,.05,{s:[.8,1.25,1],op:.95},P5);
+ const GH=new T.Group();GH.position.set(.55,0,0);EG.add(GH);
+ add(new T.SphereGeometry(.5,22,16),0xe9e2cf,0,0,0,{op:.95,g:GH},P6);add(new T.CylinderGeometry(.2,.17,1.8,16),0xe9e2cf,0,-1.1,0,{op:.95,g:GH},P6);add(new T.SphereGeometry(.12,10,8),0xd8cfb4,.25,.38,.18,{op:.97,g:GH},P6);add(new T.SphereGeometry(.09,10,8),0xd8cfb4,-.3,.15,-.3,{op:.97,g:GH},P6);
+ add(new T.SphereGeometry(.6,22,16),0x9fd7e2,0,0,0,{op:.12,g:GH},P7);add(new T.SphereGeometry(1,12,8),0x9fd7e2,0,.62,0,{s:[.38,.07,.25],op:.55,g:GH},P8);
+ add(new T.TubeGeometry(new T.CatmullRomCurve3([[0,.55,0],[.05,.35,.5],[.1,-.2,.45],[.1,-.8,.4]].map(V3)),12,.03,6),0xd8d0b8,0,0,0,{op:.97,g:GH},PA);
+ const mk=(P,col,r)=>add(new T.CylinderGeometry(r,r,1,10),col,0,0,0,{op:.95,g:EG},P),ss=mk(P1,0xc0504a,.1),is_=mk(P2,0xb04a44,.12),tm=mk(P3,0xd9803a,.06),sb=mk(P4,0xc9702a,.14);
+ const sty=(m,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],dz=b[2]-a[2],L=Math.hypot(dx,dy,dz)||.001;m.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2);m.scale.set(1,L,1);m.quaternion.setFromUnitVectors(V3([0,1,0]),V3([dx/L,dy/L,dz/L]))};
+ const Ro=(p,th)=>[GH.position.x+p[0]*Math.cos(th)-p[1]*Math.sin(th),GH.position.y+p[0]*Math.sin(th)+p[1]*Math.cos(th),p[2]];let u=0;
+ fx.push(s=>{u+=((EYX.abd?1:0)-u)*.05;const th=u*1.5;GH.rotation.z=th;
+  sty(ss,[-.9,.5,.08],Ro([.3,.45,.12],th));sty(is_,[-1.0,-.1,.08],Ro([.3,.25,.14],th));sty(tm,[-.35,-.6,.06],Ro([.28,.05,.12],th));sty(sb,[-.8,-.1,-.2],Ro([-.32,.12,-.3],th));
+  txt(EYX.abd?'ABDUCTION: supraspinatus starts it, deltoid continues; the greater tubercle passes under the acromion (painful arc 60-120 deg in impingement)':'Rotator cuff = SITS: Supraspinatus, Infraspinatus, Teres minor, Subscapularis: they hold the head in the shallow glenoid')});
+ lb([['Supraspinatus',[-1.1,.8,.2]],['Infraspinatus',[-1.2,-.4,.2]],['Teres minor',[-.5,-.95,.2]],['Subscapularis',[-1.0,.2,-.4]],['Glenoid + labrum',[.15,.45,.1]],['Humeral head',[1.3,.35,0]],['Acromion',[.6,1.2,.1]],['Subacromial bursa',[1.3,1.05,0]],['Biceps long head',[1.4,-.35,.4]]],'#ffffff');
+ return {t:'Rotator cuff + shoulder joint',s:'Back/Front view + Abduction | SITS muscles',rd:7,rm:10.5,cam:[EYX.fv?3.1416:0,.1],tg:[-.2,0,0],ex:'<button id="eyfv" class="on">View: '+(EYX.fv?'front':'back')+'</button><button id="eyab2">Arm: at side</button>'}}];EYX.libAdd('Rotator cuff (shoulder)','rcuff',0xd9803a,'SITS muscles, labrum, capsule, bursa, abduction');
+
+/* ---------- LIBRARY hub + floating button ---------- */
+EYX.N.lib=['Atlas library',c=>{
+ const {bx,lb,txt}=c;EYX.libAdd('Sex education: myths + facts','sexed',0xff8a9a,'I-pill, HIV, masturbation, sperm, cycle');
+ const L=EYX.LIB,n=L.length,rows=Math.ceil(n/2);
+ L.forEach((q,i)=>{const P=part(q[0],q[3],1,'E:'+q[1]),x=(i%2?.9:-.9),y=((rows-1)/2-Math.floor(i/2))*.62;bx(x,y,0,1.7,.5,.06,q[2],P,.95)});
+ lb(L.map((q,i)=>[q[0],[(i%2?.9:-.9),((rows-1)/2-Math.floor(i/2))*.62,.1]]),'#ffffff');txt('Library: har card ek alag detailed scene hai. Card par tap karke "Open inside" dabayein');
+ return {t:'Atlas library',s:'Muscles, cross-sections, awareness scenes | card par tap karein',rd:7,rm:9.5,cam:[0,.05],tg:[0,0,0]}}];
+if(!document.getElementById('libbtn')){const b=document.createElement('button');b.id='libbtn';b.textContent='Library';b.style.cssText='position:fixed;left:10px;top:176px;z-index:8;padding:9px 13px;border-radius:12px;font-weight:700;background:#0f2a44;color:#7fe0f0;border:1px solid #37d4e8';b.onclick=()=>{init();cur={userData:{name:'Library'}};EYX.st=['lib'];EYX.show('lib')};(document.body||document.documentElement).appendChild(b)}
+}
 })();
 /* ---- CAPTION + DRAG ---- */
 let CAP=true;const DET='Detail mode: internal composition and flow relationships.',LIVE='Live: Heart 72 bpm, Lungs 15/min. Muscles ON: biceps contracts, triceps relaxes';

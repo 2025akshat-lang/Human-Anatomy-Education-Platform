@@ -26,8 +26,8 @@ jobs:
         with:
           version: 10.34.3
 
-      - name: Install Dependencies
-        run: pnpm install
+            - name: Install Dependencies
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build
         run: pnpm build

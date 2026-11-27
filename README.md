@@ -15,9 +15,9 @@ Owner explains science/anatomy to students; chat language is **Hinglish** (Hindi
 ## 1. One-paragraph summary
 
 A **procedural (code-generated, not scanned) interactive 3D human anatomy atlas**.
-The real product is **one huge standalone file: `public/human-atlas-3d.html`** (three.js r128, plain JS, no build step for it).
-A thin **Vite + React + TypeScript shell** (`src/`) only wraps it in an `<iframe>`, adds a header (Model set: General / Female / Male / Pregnancy, Clean view) and talks to it through `postMessage`.
-All anatomy, cutaways, microscopic scenes, quiz, animations and UI of the atlas are inside that single HTML file.
+The viewer is served from `public/human-atlas-3d.html` (three.js r128), with its clinical dark-studio styles and camera, layer, and gesture controls kept in focused files under `public/styles/` and `public/js/`.
+A thin **Vite + React + TypeScript shell** (`src/`) wraps the viewer in an `<iframe>`, provides the Model set controls (General / Female / Male / Pregnancy), and communicates through `postMessage`.
+Anatomy, cutaways, microscopic scenes, quiz content, and animation builders remain in the viewer script.
 
 Everything is **educational schematic geometry, validation pending** — never claim CT/MRI accuracy.
 
@@ -34,6 +34,8 @@ Browser
       ▼                                                               │
 public/human-atlas-3d.html   (THE VIEWER, ~all logic)  ◄─────────────┘
    ├─ loads ./vendor/three.min.js   (three r128, local copy)
+   ├─ loads ./styles/anatomy-viewer.css
+   ├─ loads ./js/{anatomy-layers,camera-views,zoom-pan}.js
    ├─ Scene 1: "gross" body scene  (canvas #c, renderer R, scene S, camera C)
    └─ Scene 2: "detail" overlay    (#dv, canvas #dc, renderer R2, scene S2, camera C2)
                  = cutaways + microscopic scenes, opened by tapping a structure
@@ -44,6 +46,8 @@ Key rules:
 - **Iframe message security:** viewer only accepts messages where `e.origin === location.origin` and `e.data.type === 'human-atlas:set-sex'`, `sex ∈ general|female|male|pregnancy`.
 - **three.js is r128.** Do NOT use APIs newer than r128 (e.g. `CapsuleGeometry` is r142+, `THREE.OrbitControls` is not bundled). The npm `three` dependency in `package.json` (pinned `0.128.0`) is **unused** (viewer uses `vendor/three.min.js`).
 - Coordinate system (gross scene): units ≈ body height 9.4 (feet y≈0, head top y≈9.35). `y` up, `+z` toward the viewer (front), midline `x=0`. In the code `s=-1` is **anatomical right**, `s=+1` is **left** (names built as `s<0?'Right':'Left'`).
+- The head and cranial geometry remains centered on `x=0` and uses the same base scale in General, Female, Male, and Pregnancy states; sex-mode transforms are limited to shoulder and pelvic proportions.
+- Gross-scene camera and gesture behavior is split into `public/js/camera-views.js`, `public/js/zoom-pan.js`, and `public/js/anatomy-layers.js`; shared UI styling is in `public/styles/anatomy-viewer.css`.
 
 ---
 
@@ -52,7 +56,11 @@ Key rules:
 ### 3.1 Files that matter
 | Path | What it is |
 |---|---|
-| `public/human-atlas-3d.html` | **THE viewer. Source of truth. Edit only this copy.** |
+| `public/human-atlas-3d.html` | Viewer markup, anatomy scene builders, cutaways, and animation entrypoint. |
+| `public/styles/anatomy-viewer.css` | Dark-studio viewer theme, dock, layer drawer, and mobile layout. |
+| `public/js/anatomy-layers.js` | Layer toggle binding and accessible active-state sync. |
+| `public/js/camera-views.js` | Front / side / back / top / reset preset binding. |
+| `public/js/zoom-pan.js` | Pointer, pinch, wheel, drag-pan, and tap gesture handling. |
 | `public/vendor/three.min.js` | three.js r128 (keep) |
 | `public/404.html` | GitHub Pages SPA fallback (keep) |
 | `public/favicon.svg` | favicon (currently the **generic Figma-Make placeholder icon**: dark rounded square + white sparkle — replace with an anatomy icon) |
@@ -64,7 +72,7 @@ Key rules:
 | `src/index.css` | Shell styling (dark theme, Tailwind v4 import) |
 | `src/components/ui.tsx` | `Button` (used), `IconButton`, `SearchInput`, `StatusBadge` (**last three unused**) |
 | `src/components/icons.tsx` | `Icon` component (names used: `chevron`, `focus`, `menu`) |
-| `src/data/registry.ts` | `structures[]`, `systems[]` typed registry (5 heart entries). **Not imported anywhere (dead code)** |
+| `_legacy_unused/` | Archived patch fragments and unreferenced registry/assets retained for reference; never loaded by the app. |
 | `vite.config.ts` | Vite config, base path, plus Figma-Make plugins (see §9) |
 | `package.json` | scripts + deps (see §8). `name` is still `figma-make-app` |
 | `tsconfig.json` | `include: ["src","vite.config.ts"]`, strict, `@/*` → `src/*`, `types:["node"]`. The viewer HTML is not type-checked |
@@ -86,10 +94,14 @@ Facts found in the files:
 - **`robots.txt` contains `User-agent: *` / `Disallow: /`** → blocks all search engines, while `index.html` says `index, follow`. Origin: Figma site config (`robots.index=false`). Decide which you want. If the site should be discoverable, put a permissive `public/robots.txt` and remove the root/dist copies.
 - Recommended end state: GitHub Actions builds with pnpm and deploys `dist/` to Pages; root copies (`assets/`, `data/`, `vendor/`, `human-atlas-3d.html`, `robots.txt`, root `favicon.svg` if duplicate of `public/`) and `dist/` are removed from git and ignored.
 
-### 3.3 Safe-to-delete candidates (verify first, one commit each)
+### 3.3 Archived and inactive files
+- `_legacy_unused/public/parts/`, `_legacy_unused/public/apply_*.py`, `_legacy_unused/public/svg/`, and `_legacy_unused/public/README.txt` preserve the old patch workflow and static fragments. None are loaded by the active viewer.
+- `_legacy_unused/src/data/registry.ts` is an unimported, partial registry.
+
+### 3.4 Safe-to-delete candidates (verify first, one commit each)
 - `dist/` → `git rm -r --cached dist` (already in `.gitignore`).
 - Root build copies (`assets/`, `data/`, `vendor/`, `human-atlas-3d.html`, `robots.txt`) → only after Pages deploy is confirmed to build in CI.
-- `src/data/registry.ts`, unused exports in `ui.tsx` → dead code.
+- unused exports in `ui.tsx` → dead code.
 - `three` in `package.json` dependencies → unused.
 - **`package-lock.json`** → `.mise.toml` pins pnpm, so keep `pnpm-lock.yaml` and delete `package-lock.json`. Use `pnpm install` / `pnpm dev` / `pnpm build`.
 - `.figma/` (if present) + Figma plugins in `vite.config.ts` → see §9.
@@ -98,7 +110,7 @@ Facts found in the files:
 
 **Never delete:** `public/human-atlas-3d.html`, `public/vendor/three.min.js`, `public/404.html`, `src/App.tsx`, `src/main.tsx`, `src/index.css`, `src/components/icons.tsx`, `vite.config.ts`, `index.html`, `.mise.toml`.
 
-### 3.4 AGENTS.md / CLAUDE.md (reviewed)
+### 3.5 AGENTS.md / CLAUDE.md (reviewed)
 - `CLAUDE.md` contains only one line: `@AGENTS.md` (an import). So **`AGENTS.md` is the only real agent file.**
 - `AGENTS.md` is the untouched **Figma Make scaffold text**: title `figma-make-app`, "running inside Figma Make", "dev server already running on `$PORT` (default 8443)", a project structure listing only `src/main.tsx`, `src/App.tsx`, `src/index.css`, `index.html`, `package.json`, `vite.config.ts`, `.mise.toml`.
 - Problems: (1) it never mentions `public/human-atlas-3d.html`, which is 95% of the product, so an AI will edit the React shell and miss the real code; (2) it says the server is already running, false outside Figma; (3) it mentions Figma plugins; (4) it has no rules about three.js r128, mesh-name routing, or "procedural, validation pending".
@@ -128,9 +140,9 @@ Read README.md first (architecture, Task → Location table, recipes).
 
 ---
 
-## 5. The viewer file: `public/human-atlas-3d.html`
+## 5. The viewer: `public/human-atlas-3d.html`
 
-It is one `<style>` + one `<script>`. Sections appear in this order (search for the quoted anchor text):
+The viewer HTML loads the stylesheet and focused controls from `public/styles/` and `public/js/`; scene-building sections remain in the viewer script. Sections appear in this order (search for the quoted anchor text):
 
 ### 5.1 Gross scene (the whole body)
 | Anchor in file | Purpose |

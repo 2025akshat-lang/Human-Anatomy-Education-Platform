@@ -2,52 +2,44 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HUMAN ATLAS — Interactive 3D Anatomy</title>
-<style>
-:root{--bg:#e9eef4;--fg:#13202e;--pn:rgba(255,255,255,.94);--ac:#d6283a;--mu:#5a6b7e;--bd:#cfd8e3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1420;--fg:#e8eef6;--pn:rgba(20,30,44,.94);--mu:#93a4b8;--bd:#2a3a4f}}
-:root[data-theme="dark"]{--bg:#0c1420;--fg:#e8eef6;--pn:rgba(20,30,44,.94);--mu:#93a4b8;--bd:#2a3a4f}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:radial-gradient(ellipse at 50% 35%,#2f69a3 0%,#12345a 55%,#07172b 100%) fixed;color:var(--fg);font:14px/1.4 "Trebuchet MS",system-ui,sans-serif;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none}
-#c{position:fixed;inset:0;width:100%;height:100%;display:block}
-button{font:inherit;color:var(--fg);background:var(--pn);border:1px solid var(--bd);border-radius:10px;padding:8px 11px;cursor:pointer}
-button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-.top{position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top,0px) + 8px);display:flex;justify-content:space-between;align-items:center;gap:8px}
-.top b{font-size:16px;letter-spacing:.2px}
-.seg{display:flex;gap:4px}.seg button{padding:7px 13px;font-weight:700}
-.ban{background:var(--pn);border:1px solid var(--bd);border-radius:10px;padding:7px 11px;font-weight:700;font-size:12px;display:none}.dg{touch-action:none;cursor:grab}.dg::before{content:'⠿ ';color:var(--mu)}.card button+button{margin-left:6px}
-.side{position:fixed;right:8px;top:calc(env(safe-area-inset-top,0px) + 54px);display:flex;flex-direction:column;gap:6px}
-.side button{min-width:48px;padding:8px 6px;font-size:12px}
-.bot{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);display:flex;flex-direction:column;gap:8px}
-.card{background:var(--pn);border:1px solid var(--bd);border-radius:14px;padding:11px 13px}
-.card{touch-action:pan-y;position:relative}.card h3{padding-right:34px}.x{position:absolute;top:6px;right:6px;padding:2px 10px;z-index:2}.card p{max-height:20vh;overflow:auto}.card h3{margin:0 0 3px;font-size:16px}.card p{margin:0 0 8px;color:var(--mu);font-size:13px}
-.chips{display:flex;gap:6px;overflow-x:auto}.chips button{white-space:nowrap}
-#ls{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 10px) 10px calc(env(safe-area-inset-bottom,0px) + 10px);touch-action:pan-y}
-#ls.open{display:flex}
-#lh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-#lb{overflow-y:auto;flex:1}
-.row{display:flex;gap:10px;padding:9px 4px;border-bottom:1px solid var(--bd)}
-.row input{width:20px;height:20px;accent-color:var(--ac);flex:none}
-.row i{font-style:normal;background:var(--ac);color:#fff;border-radius:8px;padding:0 7px;font-size:12px;margin-left:4px}
-.row small{color:var(--mu)}
-[hidden]{display:none!important}
-
-.top b{font:700 13px/1 system-ui;letter-spacing:.12em}.top b small{margin-left:6px;color:#58d5dd;font-size:8px;letter-spacing:.08em}
-html,body{background:radial-gradient(ellipse at 50% 38%,#163b50 0%,#071b29 45%,#02070b 100%) fixed;font-family:Inter,system-ui,sans-serif}
-button{backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,.18)}
-.card,.ban{backdrop-filter:blur(18px)}
-</style></head><body>
+<link rel="stylesheet" href="./styles/anatomy-viewer.css">
+</head><body>
 <canvas id="c"></canvas>
-<div class="top"><b>HUMAN ATLAS <small>PROCEDURAL 3D</small></b>
+<div class="top"><b>HUMAN ATLAS</b>
 <div class="seg" id="md"><button data-m="3D" class="on">3D</button><button data-m="4D">4D</button><button data-m="5D">5D</button></div></div>
 
-<div class="side">
-<button id="cp">Details</button><button data-v="front">Front</button><button data-v="side">Side</button><button data-v="back">Back</button><button data-v="top">Top</button>
-<button id="zi">＋</button><button id="zo">－</button><button data-v="reset">Reset</button></div>
-<div class="bot">
-<div class="ban dg" id="ban"></div><div class="card" id="card" hidden><button id="zout" class="x">✕</button><h3 id="nm" class="dg"></h3><p id="in"></p><button id="detail">Open cutaway</button></div>
-<div class="chips" id="ch"><button data-l="bones" class="on">Bones</button><button data-l="organs">Organs</button><button data-l="vessels">Vessels</button><button data-l="nerves" class="on">Nerves</button><button data-l="muscles">Muscles</button><button data-l="skin">Skin</button><button id="skb">Skin layers</button><button id="lst">206 Tracker</button></div></div>
-<div id="ls"><div id="lh"><b id="cnt">0/206 yaad</b><button id="lx">Band karo</button></div><div id="lb"></div></div>
+<div class="ban dg" id="ban"></div>
+<div class="card" id="card" hidden><button id="zout" class="x" aria-label="Close details">×</button><h3 id="nm" class="dg"></h3><p id="in"></p><button id="detail">Open cutaway</button></div>
+<nav class="studio-dock" aria-label="Layers and camera controls">
+  <button id="layers-toggle" aria-expanded="false" aria-controls="layers-panel">Layers</button>
+  <span class="dock-divider" aria-hidden="true"></span>
+  <span class="dock-label">View</span>
+  <div class="camera-views" aria-label="Camera view">
+    <button data-v="front">Front</button><button data-v="side">Side</button><button data-v="back">Back</button><button data-v="top">Top</button>
+  </div>
+  <span class="dock-divider" aria-hidden="true"></span>
+  <div class="zoom-controls" aria-label="Zoom controls">
+    <button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button data-v="reset">Reset</button>
+  </div>
+  <span class="dock-divider" aria-hidden="true"></span>
+  <button id="pan-toggle" aria-pressed="false">Pan</button>
+  <button id="cp">Details</button>
+  <button id="lst">Tracker</button>
+</nav>
+<section class="layers-panel" id="layers-panel" hidden aria-label="Anatomical layers">
+  <div class="layers-heading"><b>Systems</b><small>Toggle visible structures</small></div>
+  <div class="layer-list" id="ch">
+    <button data-l="bones" class="on" aria-pressed="true">Bones</button><button data-l="organs" aria-pressed="true">Organs</button>
+    <button data-l="vessels" aria-pressed="true">Vessels</button><button data-l="nerves" class="on" aria-pressed="true">Nerves</button>
+    <button data-l="muscles" aria-pressed="false">Muscles</button><button data-l="skin" aria-pressed="true">Skin</button>
+    <button id="skb">Skin layers</button>
+  </div>
+</section>
+<div id="ls"><div id="lh"><b id="cnt">0/206 bones reviewed</b><button id="lx">Close</button></div><div id="lb"></div></div>
 <script src="./vendor/three.min.js"></script>
+<script src="./js/anatomy-layers.js"></script>
+<script src="./js/camera-views.js"></script>
+<script src="./js/zoom-pan.js"></script>
 <script>
 const T=THREE,$=s=>document.querySelector(s),el=$('#c');
 const R=new T.WebGLRenderer({canvas:el,antialias:true,alpha:true});R.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -505,16 +497,18 @@ const baseR=()=>C.aspect<.8?24:16;
 const V={th:0,el:.1,r:16,t:new T.Vector3(0,4.6,0)},W={th:0,el:.1,r:16,t:new T.Vector3(0,4.6,0)};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 let mode='3D',selm=null,q=null,score=0,tot=0;
-function resize(){R.setSize(innerWidth,innerHeight);C.aspect=innerWidth/innerHeight;C.near=.05;C.updateProjectionMatrix();if(!selm)W.r=baseR()}
+let cameraHome={th:0,el:.1,r:baseR(),t:new T.Vector3(0,4.6,0)};
+function homeRadius(){return currentSex==='female'?(C.aspect<.8?10:6.8):currentSex==='male'?(C.aspect<.8?7:4.6):currentSex==='pregnancy'?(C.aspect<.8?8:5.4):baseR()}
+function resize(){R.setSize(innerWidth,innerHeight);C.aspect=innerWidth/innerHeight;C.near=.05;C.updateProjectionMatrix();if(!selm){cameraHome.r=homeRadius();W.r=cameraHome.r}}
 addEventListener('resize',resize);resize();V.r=W.r;
 function paint(){pick.forEach(m=>{const o=m.userData.op||((isB(m)&&L.organs)?.4:/lung/.test(m.userData.name)?.86:1);
- m.material.opacity=selm&&m!==selm?Math.min(o,.22):o;m.material.emissive.setHex(m===selm?0x8a1c1c:0);m.material.depthWrite=m.material.opacity>.9})}
-function applyL(){Object.keys(L).forEach(k=>G[k].visible=L[k]);G.female.visible=(currentSex==='female'||currentSex==='pregnancy')&&L.organs;G.male.visible=currentSex==='male'&&L.organs;G.pregnancy.visible=currentSex==='pregnancy'&&L.organs;document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',L[b.dataset.l]));paint();if(mode=='3D')ban(L.muscles&&CAP?'Muscle types: Skeletal = red, striated, voluntary | Cardiac = dark red, branched | Smooth = pale, spindle':'')}
+ m.material.opacity=selm&&m!==selm?Math.min(o,.22):o;m.material.emissive.setHex(m===selm?0x6bc8c2:0);m.material.depthWrite=m.material.opacity>.9})}
+function applyL(){Object.keys(L).forEach(k=>G[k].visible=L[k]);G.female.visible=(currentSex==='female'||currentSex==='pregnancy')&&L.organs;G.male.visible=currentSex==='male'&&L.organs;G.pregnancy.visible=currentSex==='pregnancy'&&L.organs;HumanAtlasLayers.sync($('#ch'),L);paint();if(mode=='3D')ban(L.muscles&&CAP?'Muscle types: Skeletal = red, striated, voluntary | Cardiac = dark red, branched | Smooth = pale, spindle':'')}
 function sel(m){selm=m;const bb=new T.Box3().setFromObject(m);W.t.copy(bb.getCenter(new T.Vector3()));
  W.r=clamp(bb.getSize(new T.Vector3()).length()*2.6+1.5,2.6,12);
  $('#nm').textContent=m.userData.name;capUI();$('#card').hidden=false;paint()}
-function clr(){selm=null;$('#card').hidden=true;W.t.set(0,4.6,0);W.r=baseR();paint()}
-function view(v){if(v=='reset'){clr();W.th=V.th+wrap(0-V.th);W.el=.1;return}
+function clr(){selm=null;$('#card').hidden=true;W.t.copy(cameraHome.t);W.r=cameraHome.r;W.th=V.th+wrap(cameraHome.th-V.th);W.el=cameraHome.el;paint()}
+function view(v){if(v=='reset'){clr();return}
  const th={front:0,side:Math.PI/2,back:Math.PI}[v];
  if(v=='top'){W.el=1.45}else{W.th=V.th+wrap(th-V.th);W.el=.1}}
 function ban(msg){const b=$('#ban');b.style.display=msg?'block':'none';b.textContent=msg||''}
@@ -525,14 +519,7 @@ function setMode(m){mode=m;document.querySelectorAll('[data-m]').forEach(b=>b.cl
  if(m=='4D'){L.bones=true;L.organs=true;L.vessels=true;L.skin=false}if(m=='5D'){L.organs=false;L.vessels=false;L.skin=false;L.muscles=false;L.bones=true;score=0;tot=0}
  applyL();clr();ban(m=='4D'&&CAP?LIVE:'');if(m=='5D')nextQ()}
 /* ---- INPUT ---- */
-const P=new Map(),RC=new T.Raycaster();let mv=0,t0=0,pd=0;
-const pinch=()=>{if(P.size<2)return 0;const a=[...P.values()];return Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])};
-el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY]);if(P.size==1){mv=0;t0=Date.now()}pd=pinch();if(P.size==2){const a=[...P.values()];FP=hit((a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2)}});
-el.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];p[0]=e.clientX;p[1]=e.clientY;mv+=Math.abs(dx)+Math.abs(dy);
- if(P.size==1){W.th-=dx*.008;W.el=clamp(W.el+dy*.008,-1.3,1.45)}else{const d=pinch(),a=[...P.values()];if(pd&&d)zm(clamp(pd/d,.9,1.1),0,0,1);pd=d}});
-const up=e=>{if(e.type=='pointerup'&&P.size==1&&mv<8&&Date.now()-t0<400)tap(e);P.delete(e.pointerId);pd=0};
-el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
-el.addEventListener('wheel',e=>{e.preventDefault();zm(1+e.deltaY*.001,e.clientX,e.clientY)},{passive:false});
+const RC=new T.Raycaster();
 function tap(e){const r=el.getBoundingClientRect();
  RC.setFromCamera(new T.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),C);
  const h=RC.intersectObjects(pick.filter(m=>{let o=m,ok=true;while(o){if(!o.visible)ok=false;o=o.parent}return ok}));
@@ -542,11 +529,16 @@ function tap(e){const r=el.getBoundingClientRect();
  sel(m)}
 /* ---- UI ---- */
 $('#md').onclick=e=>e.target.dataset.m&&setMode(e.target.dataset.m);
-document.querySelector('.side').onclick=e=>{const v=e.target.dataset.v;if(v)view(v)};
+HumanAtlasCameraViews.bind($('.studio-dock'),view);
 $('#zi').onclick=()=>zm(.75,innerWidth/2,innerHeight/2);$('#zo').onclick=()=>zm(1.3,innerWidth/2,innerHeight/2);
 $('#zout').onclick=()=>clr();
 $('#detail').onclick=()=>{if(selm)openDV(selm,false)};
-$('#ch').onclick=e=>{const k=e.target.dataset.l;if(k){L[k]=!L[k];applyL()}};
+HumanAtlasLayers.bind($('#ch'),k=>{L[k]=!L[k];applyL()});
+let panEnabled=false;
+$('#pan-toggle').onclick=event=>{panEnabled=!panEnabled;event.currentTarget.setAttribute('aria-pressed',String(panEnabled));event.currentTarget.classList.toggle('on',panEnabled)};
+const layersToggle=$('#layers-toggle'),layersPanel=$('#layers-panel');
+layersToggle.onclick=()=>{const open=layersPanel.hidden;layersPanel.hidden=!open;layersToggle.setAttribute('aria-expanded',String(open))};
+document.addEventListener('keydown',event=>{if(event.key==='Escape'){layersPanel.hidden=true;layersToggle.setAttribute('aria-expanded','false')}});
 const GR=[['Cranium (khopdi)',8,'Frontal, Parietal x2, Temporal x2, Occipital, Sphenoid, Ethmoid'],['Face (chehra)',14,'Maxilla x2, Zygomatic x2, Nasal x2, Lacrimal x2, Palatine x2, Inf. nasal concha x2, Vomer, Mandible'],['Ear ossicles',6,'Malleus x2, Incus x2, Stapes x2'],['Hyoid',1,'U-shaped, no articulation'],['Cervical vertebrae',7,'C1 Atlas, C2 Axis, C7 Vertebra prominens'],['Thoracic vertebrae',12,'Costal facets for ribs'],['Lumbar vertebrae',5,'Largest bodies'],['Sacrum',1,'5 fused vertebrae'],['Coccyx',1,'3-5 fused vertebrae'],['Sternum',1,'Manubrium, Body, Xiphoid'],['Ribs',24,'True 1-7 (14), False 8-10 (6), Floating 11-12 (4)'],['Upper limbs',64,'Har side 32: Clavicle, Scapula, Humerus, Radius, Ulna, 8 Carpals, 5 Metacarpals, 14 Phalanges'],['Lower limbs',62,'Har side 31: Hip bone, Femur, Patella, Tibia, Fibula, 7 Tarsals, 5 Metatarsals, 14 Phalanges']];
 let done={};try{done=JSON.parse(localStorage.getItem('a206')||'{}')}catch(e){}
 function rl(){let n=0;$('#lb').innerHTML=GR.map((g,i)=>{if(done[i])n+=g[1];return `<label class="row"><input type="checkbox" data-i="${i}" ${done[i]?'checked':''}><span><b>${g[0]}</b><i>${g[1]}</i><br><small>${g[2]}</small></span></label>`}).join('');$('#cnt').textContent=n+'/206 yaad'}
@@ -554,9 +546,9 @@ $('#lb').onchange=e=>{done[e.target.dataset.i]=e.target.checked;try{localStorage
 $('#lst').onclick=()=>{rl();$('#ls').classList.add('open')};$('#lx').onclick=()=>$('#ls').classList.remove('open');
 /* ---- ORGAN DETAIL VIEW ---- */
 (()=>{
-const st=document.createElement('style');st.textContent='#dv{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,#2a4f7c,#07172b);display:none;touch-action:none;z-index:20}#dv.open{display:block}#dc{position:absolute;inset:0;width:100%;height:100%}#dh{position:absolute;left:10px;right:10px;top:calc(env(safe-area-inset-top,0px) + 10px);display:flex;justify-content:space-between;align-items:center;color:#fff;gap:8px}#dh b{font-size:16px}#dh small{display:block;font-weight:400;font-size:11px;opacity:.85}#dn{position:absolute;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 56px);background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:9px 12px;font-size:13px;max-height:24vh;overflow:auto;touch-action:pan-y}#dl{position:absolute;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);display:flex;gap:6px;overflow-x:auto;touch-action:pan-x}#dl button{white-space:nowrap}';document.head.appendChild(st);
+const st=document.createElement('style');st.textContent='#dv{position:fixed;inset:0;background:#050a0e;display:none;touch-action:none;z-index:20}#dv.open{display:block}#dc{position:absolute;inset:0;width:100%;height:100%}#dh{position:absolute;left:10px;right:10px;top:calc(env(safe-area-inset-top,0px) + 10px);display:flex;justify-content:space-between;align-items:center;color:#fff;gap:8px}#dh b{font-size:16px}#dh small{display:block;font-weight:400;font-size:11px;opacity:.85}#dn{position:absolute;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 56px);background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:9px 12px;font-size:13px;max-height:24vh;overflow:auto;touch-action:pan-y}#dl{position:absolute;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);display:flex;gap:6px;overflow-x:auto;touch-action:pan-x}#dl button{white-space:nowrap}';document.head.appendChild(st);
 const DV=document.createElement('div');DV.id='dv';DV.innerHTML='<canvas id="dc"></canvas><div id="scalePath">BODY / STRUCTURE / INTERNAL ANATOMY</div><div id="dh"><b id="dtt"></b><button id="dx">\u2715</button></div><div id="dn" hidden></div><div id="dl"></div>';document.body.appendChild(DV);
-const scaleStyle=document.createElement('style');scaleStyle.textContent='#scalePath{position:absolute;z-index:4;left:10px;top:calc(env(safe-area-inset-top,0px) + 4px);color:#68dbe2;font:700 9px/1 system-ui;letter-spacing:.09em;text-transform:uppercase}#dh{top:calc(env(safe-area-inset-top,0px) + 22px)!important}';document.head.appendChild(scaleStyle);
+const scaleStyle=document.createElement('style');scaleStyle.textContent='#scalePath{position:absolute;z-index:4;left:10px;top:calc(env(safe-area-inset-top,0px) + 4px);color:var(--accent);font:700 9px/1 system-ui;letter-spacing:.09em;text-transform:uppercase}#dh{top:calc(env(safe-area-inset-top,0px) + 22px)!important}';document.head.appendChild(scaleStyle);
 let cur,live=false,kind='',gs=[],ret=null,cells=[],tgs=[],shell=null,shellM=null,lph='',R2,S2,C2,G2,pk=[],parts=[],flows=[],selP=null,isOpen=false,th=.5,el=.1,r=5,tth=.5,tel=.1,tr=5,fl=true,lt=0;const tg=new T.Vector3(0,.2,0);
 const init=()=>{if(R2)return;R2=new T.WebGLRenderer({canvas:$('#dc'),antialias:true,alpha:true});R2.setPixelRatio(Math.min(devicePixelRatio,2));R2.localClippingEnabled=true;S2=new T.Scene();C2=new T.PerspectiveCamera(40,1,.05,100);S2.add(new T.HemisphereLight(0xffffff,0x667788,.95));const a=new T.DirectionalLight(0xffffff,.8);a.position.set(3,5,6);S2.add(a);const b=new T.DirectionalLight(0xbcd8ff,.35);b.position.set(-4,2,-5);S2.add(b)};
 const part=(n,i,chip,v)=>{const P={n,i,m:[],chip,v};parts.push(P);return P};
@@ -3235,8 +3227,10 @@ function drag(h,box){let sx=0,sy=0,ox=0,oy=0,dn=false;
 drag($('#nm'),$('#card'));drag($('#ban'),$('#ban'));
 /* ---- LOOP ---- */
 const RZ=new T.Raycaster(),vis=m=>{for(let o=m;o;o=o.parent)if(!o.visible)return false;return true};
-let FP=null;const hit=(cx,cy)=>{RZ.setFromCamera(new T.Vector2(cx/innerWidth*2-1,-(cy/innerHeight)*2+1),C);const hs=RZ.intersectObjects(pick.filter(vis)),h=hs.find(x=>/^Gallbladder/.test(x.object.userData.name))||hs[0];return h?h.point.clone():null};
-function zm(f,cx,cy,keep){W.r=clamp(W.r*f,.4,30);if(f<1){const p=keep?FP:hit(cx,cy);if(p)W.t.lerp(p,Math.min(.35,(1-f)*1.6))}else if(!selm)W.t.lerp(new T.Vector3(0,4.6,0),Math.min(.5,(f-1)*1.5))}
+const hit=(cx,cy)=>{const rect=el.getBoundingClientRect();RZ.setFromCamera(new T.Vector2((cx-rect.left)/rect.width*2-1,-(cy-rect.top)/rect.height*2+1),C);const hs=RZ.intersectObjects(pick.filter(vis)),h=hs.find(x=>/^Gallbladder/.test(x.object.userData.name))||hs[0];return h?h.point.clone():null};
+function zm(f,cx,cy){const anchor=hit(cx,cy),old=W.r;W.r=clamp(old*f,.4,30);if(anchor)W.t.addScaledVector(anchor.clone().sub(W.t),1-W.r/old)}
+function pan(dx,dy){const scale=2*V.r*Math.tan(C.fov*Math.PI/360)/Math.max(innerHeight,1),right=new T.Vector3().setFromMatrixColumn(C.matrix,0),up=new T.Vector3().setFromMatrixColumn(C.matrix,1);W.t.addScaledVector(right,-dx*scale).addScaledVector(up,dy*scale)}
+HumanAtlasZoomPan.bind({viewport:el,onTap:tap,onRotate:(dx,dy)=>{W.th-=dx*.008;W.el=clamp(W.el+dy*.008,-1.3,1.45)},onPan:pan,onZoom:zm,panMode:()=>panEnabled});
 /* ---- v3: nerves + signals, fine vessels, scalp hair ---- */
 G.nerves=new T.Group();S.add(G.nerves);(()=>{const NV=0xf2e08a,nvi='Nerve: motor signals go brain > muscle (yellow pulses), sensory signals skin > brain (cyan pulses). Action potentials travel 1-120 m/s.',nvp=[],nerveTube=(pts,n,i,r,c)=>{const m=tb(G.nerves,pts,c||NV,r||.008,n,i||nvi);m.material.emissive.setHex(c||NV);m.material.emissiveIntensity=.12;return m};
 const nvT=(pts,n,i,r)=>{nerveTube(pts,n,i,r||.012);const c=new T.CatmullRomCurve3(pts.map(V3));for(let k=0;k<4;k++){const m=new T.Mesh(new T.SphereGeometry(.03,10,8),new T.MeshBasicMaterial({color:k%2?0x6fe0ff:0xffee44}));G.nerves.add(m);nvp.push({c,m,k})}};
@@ -3298,9 +3292,13 @@ const clk=new T.Clock();
  R.render(S,C)})();
 const sexBase=new Map();pick.forEach(m=>sexBase.set(m,{p:m.position.clone(),s:m.scale.clone()}));
 function setSexMorphology(sex){currentSex=sex;if(sex!=='general')L.organs=true;G.female.visible=(sex==='female'||sex==='pregnancy')&&L.organs;G.male.visible=sex==='male'&&L.organs;G.pregnancy.visible=sex==='pregnancy'&&L.organs;pick.forEach(m=>{const b=sexBase.get(m);if(!b)return;m.position.copy(b.p);m.scale.copy(b.s);const n=m.userData.name;
- if(sex==='female'||sex==='pregnancy'){if(/Hip bone|Hip joint|Sacroiliac|Pubic symphysis/.test(n)){m.position.x*=1.1;m.scale.x*=1.08}if(/Clavicle|Scapula|Shoulder joint/.test(n))m.position.x*=.96;if(/Cranium|Frontal bone|Parietal bone|Occipital bone/.test(n))m.scale.multiplyScalar(.98)}
- if(sex==='male'){if(/Hip bone|Hip joint|Sacroiliac|Pubic symphysis/.test(n)){m.position.x*=.96;m.scale.x*=.97}if(/Clavicle|Scapula|Shoulder joint/.test(n))m.position.x*=1.06;if(/Cranium|Frontal bone|Parietal bone|Occipital bone/.test(n))m.scale.multiplyScalar(1.025)}});document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',L[b.dataset.l]));paint();
- if(sex==='general'){W.t.set(0,4.6,0);W.r=baseR()}else if(sex==='female'){W.t.set(0,4.45,.1);W.r=C.aspect<.8?10:6.8}else if(sex==='male'){W.t.set(0,3.15,.15);W.r=C.aspect<.8?7:4.6}else{W.t.set(0,4.1,.15);W.r=C.aspect<.8?8:5.4}W.th=V.th+wrap(0-V.th);W.el=.08;ban(sex==='general'?'General model — sex-specific reproductive anatomy hidden':sex==='female'?'Female model focused — breast and pelvic structures visible; tap twice for detail':sex==='male'?'Male model focused — pelvic and external structures visible; tap twice for detail':'Pregnancy state focused — placenta and cord shown separately · procedural educational geometry')}
+ if(sex==='female'||sex==='pregnancy'){if(/Hip bone|Hip joint|Sacroiliac|Pubic symphysis/.test(n)){m.position.x*=1.1;m.scale.x*=1.08}if(/Clavicle|Scapula|Shoulder joint/.test(n))m.position.x*=.96}
+ if(sex==='male'){if(/Hip bone|Hip joint|Sacroiliac|Pubic symphysis/.test(n)){m.position.x*=.96;m.scale.x*=.97}if(/Clavicle|Scapula|Shoulder joint/.test(n))m.position.x*=1.06}});
+ HumanAtlasLayers.sync($('#ch'),L);
+ const centers={general:[0,4.6,0],female:[0,4.45,.1],male:[0,3.15,.15],pregnancy:[0,4.1,.15]};
+ cameraHome={th:0,el:.08,r:homeRadius(),t:new T.Vector3(...centers[sex])};
+ clr();
+ ban(sex==='general'?'General model — sex-specific reproductive anatomy hidden':sex==='female'?'Female model focused — breast and pelvic structures visible; tap twice for detail':sex==='male'?'Male model focused — pelvic and external structures visible; tap twice for detail':'Pregnancy state focused — placenta and cord shown separately · procedural educational geometry')}
 addEventListener('message',e=>{if(e.origin!==location.origin||e.data?.type!=='human-atlas:set-sex')return;if(['general','female','male','pregnancy'].includes(e.data.sex))setSexMorphology(e.data.sex)});
 applyL();
 </script></body></html>

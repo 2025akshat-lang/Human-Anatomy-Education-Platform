@@ -112,6 +112,7 @@ button.on, button[aria-pressed="true"] {
   transform: translateX(-50%);
   scrollbar-width: none;
 }
+.studio-dock > * { flex: 0 0 auto; }
 .studio-dock::-webkit-scrollbar, .layer-list::-webkit-scrollbar { display: none; }
 .dock-divider { width: 1px; height: 22px; flex: 0 0 1px; margin: 0 3px; background: var(--line); }
 .dock-label { padding: 0 5px; color: var(--muted); font-size: 10px; letter-spacing: .04em; }

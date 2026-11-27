@@ -1,12 +1,5 @@
 window.HumanAtlasZoomPan = {
-  bind({
-    viewport,
-    onTap,
-    onRotate,
-    onPan,
-    onZoom,
-    panMode,
-  }) {
+  bind({ viewport, onTap, onRotate, onPan, onZoom, panMode }) {
     const pointers = new Map()
     let pinchDistance = 0
     let previousCenter = null
@@ -15,10 +8,13 @@ window.HumanAtlasZoomPan = {
 
     const center = () => {
       const points = [...pointers.values()]
-      return points.reduce((point, current) => ({
-        x: point.x + current.x / points.length,
-        y: point.y + current.y / points.length,
-      }), { x: 0, y: 0 })
+      return points.reduce(
+        (point, current) => ({
+          x: point.x + current.x / points.length,
+          y: point.y + current.y / points.length,
+        }),
+        { x: 0, y: 0 },
+      )
     }
 
     const distance = () => {
@@ -26,7 +22,7 @@ window.HumanAtlasZoomPan = {
       return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0
     }
 
-    viewport.addEventListener("pointerdown", event => {
+    viewport.addEventListener("pointerdown", (event) => {
       if (event.button !== 0 && event.button !== 1 && event.button !== 2) return
       viewport.setPointerCapture(event.pointerId)
       pointers.set(event.pointerId, {
@@ -43,7 +39,7 @@ window.HumanAtlasZoomPan = {
       }
     })
 
-    viewport.addEventListener("pointermove", event => {
+    viewport.addEventListener("pointermove", (event) => {
       const pointer = pointers.get(event.pointerId)
       if (!pointer) return
       const dx = event.clientX - pointer.x
@@ -61,7 +57,11 @@ window.HumanAtlasZoomPan = {
       if (pointers.size >= 2) {
         const nextCenter = center()
         const nextDistance = distance()
-        if (previousCenter) onPan(nextCenter.x - previousCenter.x, nextCenter.y - previousCenter.y)
+        if (previousCenter)
+          onPan(
+            nextCenter.x - previousCenter.x,
+            nextCenter.y - previousCenter.y,
+          )
         if (pinchDistance && nextDistance) {
           onZoom(pinchDistance / nextDistance, nextCenter.x, nextCenter.y, true)
         }
@@ -70,9 +70,13 @@ window.HumanAtlasZoomPan = {
       }
     })
 
-    const finish = event => {
+    const finish = (event) => {
       if (!pointers.has(event.pointerId)) return
-      const isTap = event.type === "pointerup" && pointers.size === 1 && moved < 8 && Date.now() - startedAt < 400
+      const isTap =
+        event.type === "pointerup" &&
+        pointers.size === 1 &&
+        moved < 8 &&
+        Date.now() - startedAt < 400
       pointers.delete(event.pointerId)
       pinchDistance = 0
       previousCenter = null
@@ -80,10 +84,19 @@ window.HumanAtlasZoomPan = {
     }
     viewport.addEventListener("pointerup", finish)
     viewport.addEventListener("pointercancel", finish)
-    viewport.addEventListener("contextmenu", event => event.preventDefault())
-    viewport.addEventListener("wheel", event => {
-      event.preventDefault()
-      onZoom(Math.exp(Math.max(-120, Math.min(120, event.deltaY)) * 0.001), event.clientX, event.clientY, false)
-    }, { passive: false })
+    viewport.addEventListener("contextmenu", (event) => event.preventDefault())
+    viewport.addEventListener(
+      "wheel",
+      (event) => {
+        event.preventDefault()
+        onZoom(
+          Math.exp(Math.max(-120, Math.min(120, event.deltaY)) * 0.001),
+          event.clientX,
+          event.clientY,
+          false,
+        )
+      },
+      { passive: false },
+    )
   },
 }

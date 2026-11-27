@@ -46,6 +46,8 @@ Key rules:
 - **Iframe message security:** viewer only accepts messages where `e.origin === location.origin` and `e.data.type === 'human-atlas:set-sex'`, `sex ∈ general|female|male|pregnancy`.
 - **three.js is r128.** Do NOT use APIs newer than r128 (e.g. `CapsuleGeometry` is r142+, `THREE.OrbitControls` is not bundled). The npm `three` dependency in `package.json` (pinned `0.128.0`) is **unused** (viewer uses `vendor/three.min.js`).
 - Coordinate system (gross scene): units ≈ body height 9.4 (feet y≈0, head top y≈9.35). `y` up, `+z` toward the viewer (front), midline `x=0`. In the code `s=-1` is **anatomical right**, `s=+1` is **left** (names built as `s<0?'Right':'Left'`).
+- The head and cranial geometry remains centered on `x=0` and uses the same base scale in General, Female, Male, and Pregnancy states; sex-mode transforms are limited to shoulder and pelvic proportions.
+- Gross-scene camera and gesture behavior is split into `public/js/camera-views.js`, `public/js/zoom-pan.js`, and `public/js/anatomy-layers.js`; shared UI styling is in `public/styles/anatomy-viewer.css`.
 
 ---
 

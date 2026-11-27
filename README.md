@@ -198,7 +198,7 @@ Overlay DOM: `#dv` (container), `#dc` (canvas), `#dh` header `#dtt`, `#dn` info 
 | `shell`, `shellM` | "outer layer" + material for the Outer layer / Cutaway toggle chips |
 
 **Scene builders (name → what it draws):**
-`heart()`, `openMV(name,'a'|'v')` (vessel wall micro), `lungs()`, `openAV()` (alveolus), `kidney()`+`nephX()`, `openNP()` (nephron), `liver()`, `openLB()` (hepatic lobule), `stomach()`, `sint()`, `colon()`, `brain()` (+ hippocampus/BG/ventricles added by wrapper), `eye()`, `panc()`, `spleen()`, `bladder()`, `thyroid()`, `thymus()`, `tongue()`, `ear()`, `upair()`, `cord()`, `nerve()`, `adrenal()`, `gall()`, `knee()`, `breastDV()`, `femaleRepDV()`, `maleRepDV()`, `pregnancyDV()`, `skullDV()`, `jointDV(name)` driven by data table `JD`, `boneDV2(m)`, `generic(m)` fallback.
+`heart()`, `openMV(name,'a'|'v')` (vessel wall micro), `lungs()`, `openAV()` (alveolus), `kidney()`+`nephX()`, `openNP()` (nephron), `liver()`, `openLB()` (hepatic lobule), `stomach()`, `sint()`, `colon()`, `brain()` (+ hippocampus/BG/ventricles added by wrapper), `eye()`, `panc()`, `spleen()`, `bladder()`, `thyroid()`, `thymus()`, `tongue()`, `ear()`, `upair()`, `cord()`, `nerve()`, `adrenal()`, `gall()`, `knee()`, `breastDV()`, `femaleRepDV()`, `maleRepDV()`, `pregnancyDV()`, the nested reproductive nodes in `EYX.N` (including the side-aware `scrotum` view), `skullDV()`, `jointDV(name)` driven by data table `JD`, `boneDV2(m)`, `generic(m)` fallback.
 `NXB = {s,si,li,br,ey,pa,sp,bl,th,ty,to,ea,ua,sc,nv,ad,gb}` maps short key → builder.
 
 **Micro-scene builders (window.*):** `openSK` (skin), `openReproMicro(code)` (rb re ro rt rp rpl), `openBM` (bone microarchitecture), `openJC` (articular cartilage), `openLG` (ligament/enthesis), `openSN` (GABA synapse), `openIC` (ion channels), `openGM` (GABA molecule + receptor), `openCa` (Ca²⁺ channel), `openNM` (neuromuscular junction), `openTT` (dental chart), `openTC` (tooth cross-section), `openTM` (tooth micro).
@@ -208,6 +208,7 @@ Overlay DOM: `#dv` (container), `#dc` (canvas), `#dh` header `#dtt`, `#dn` info 
    ➜ **Mesh names are an API.** Renaming a mesh in the gross scene changes which cutaway opens, breaks the 5D quiz match, and breaks `JD` lookup.
 2. **Detail → micro:** the `$('#dn').onclick` handler dispatches on `P.v`:
    `r*`→`openReproMicro` · `tc`→`openTC` · `tm`→`openTM` · `gm`→`openGM` · `ca`→`openCa` · `nm`→`openNM` · `sy`→`openSN` · `ic`→`openIC` · `x`→`openAV` · `n`→`openNP` · `bm`→`openBM` · `jc`→`openJC` · `lg`→`openLG` · `b`→`openLB` · `a`/`v`→`openMV(name,…)`.
+3. **Reproductive drill-down:** left/right gross scrotal-layer meshes route to `EYX.N.scrotum`; its title and `#scalePath` preserve the side and parent path. The scrotal layer rings are separate selectable parts. The penis cross-section opens `EYX.N.erection` for physiology, with a matching nested breadcrumb and return path. The detail reset clears the prior builder return callback before a new scene is constructed.
    ➜ **Gotcha:** the first test is `P.v.startsWith('r')`, so **any new micro code must NOT start with `r`** (`rb re ro rt rp rpl` are taken by reproductive micro scenes).
 3. **Patching pattern used in v3–v5:** later sections wrap earlier builders (`const _br=NXB.br; NXB.br=()=>{_br(); …add parts…}`) and set `p.v` codes after the fact (`parts.forEach(p=>{if(/regex/.test(p.n))p.v='sy'})`). Prefer editing the original builder when possible; use the wrapper pattern for small additions.
 
@@ -233,6 +234,8 @@ Overlay DOM: `#dv` (container), `#dc` (canvas), `#dh` header `#dtt`, `#dn` info 
 | Add **eye microscopic detail** (light → cells, retina layers, rods/cones, photoreceptor discs, RPE) | New `window.openEM=()=>{…}` + tag a part (e.g. Retina/Cornea/Lens) with `.v='em'` + new branch in `$('#dn').onclick` (recipe §7.1). Eye is routed by `n=='Eye'`→`NXB.ey` in `openDV` |
 | Fix **male reproductive gross** | lines `sexm(G.male,` (prostate, seminal vesicles, testis, tunicae, scrotal layers, ductus, epididymis, penis, glands) |
 | Fix **male cutaway** | `const maleRepDV=()=>` |
+| Fix **scrotal layers** | `EYX.N.scrotum` and the male reproductive routing block (`/scrotal/i`) |
+| Fix **penis cross-section / erection physiology** | `EYX.N.penis` and `EYX.N.erection` |
 | Fix **male micro** | `openReproMicro` branches `t==='rt'` (seminiferous) and `t==='rp'` (prostate) |
 | Fix **female gross / cutaway / micro** | `sexm(G.female,` · `const femaleRepDV=()=>` · `openReproMicro` `rb re ro` |
 | Pregnancy | `sexm(G.pregnancy,` · `const pregnancyDV=()=>` · `openReproMicro` `rpl` |
@@ -283,7 +286,7 @@ Overlay DOM: `#dv` (container), `#dc` (canvas), `#dh` header `#dtt`, `#dn` info 
 `mk(G.organs, sp(.1), 0xcolor, x, y, z, 'Exact Name', 'Info text', {s:[1,1,1]})` (or `on(...)`, `bn(...)`, `sexm(G.male,…)`). Then decide its cutaway: add a regex in `openDV` or let it fall to `generic()`. If the name should open a joint cross-section, add an entry to `JD` and a hotspot with the **same name**.
 
 ### 7.3 Fix overlapping transparent shells (e.g. male testis/tunicae/scrotum)
-Testis, tunica vaginalis, tunica albuginea and scrotal layers are separate spheres at the **same centre** with slightly different scales and opacities (`.24`, `.38`, `.18`). Raycast hits the outermost; they are hard to select individually. Fix by: larger scale gaps, separate depth/offset, or splitting into a dedicated cutaway where each layer is clipped (`ad2`) like in `maleRepDV`.
+Gross testis, tunica vaginalis, tunica albuginea and scrotal layers are concentric shells, so raycasting selects their outer surface first. The left/right scrotal-layer meshes now open the dedicated `EYX.N.scrotum` view, where each wall layer is represented by a separately selectable, depth-spaced ring.
 
 ### 7.4 Add an info-text-only fix
 Info strings are the 9th argument of `mk` / 2nd of `part`. Do not start a gross-mesh info string with `[` unless you want to skip the auto `[System]` tag.
